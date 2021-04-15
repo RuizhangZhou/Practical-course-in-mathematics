@@ -95,12 +95,12 @@
             |[start]| {Start} & \\
             |[block]| {\(n_0 = 0\) \\ \(x_{1, \text{Re}} = 0\) \\ \(x_{2, \text{Re}} = 0\) \\ \(x_{1,\text{Im}} = 0\) \\ \(x_{2,\text{Im}} = 0\)} \\
             |[decision]| {Ist \(p(x)\) konstant?} & & |[decision]| {Ist \(p(x)\) linear?} & |[block]| {\(p = \frac{b}{a}, q = \frac{c}{a}\)} & |[subprogram]| {\(s = \sqrt{\texttt{DBL\_MAX}}\)} & |[subprogram]| {\(p' = \abs{p}\)} & |[decision]| {Gilt \(\frac{p'}{2} > s\)?} & |[block]| {\(d = 0.25 - \frac{\frac{q}{p}}{p}\)} \\
-            |[decision]| {Ist \(c = 0\)?} & |[block]| {\(n_0 = 0\)} & |[block]| {\(n_0 = 1, x_1 = -\frac{c}{b}\)} & |[subprogram]| {\(w = \sqrt{-d}\)} & |[decision]| {Ist \(d = 0\)?} & |[decision]| {Ist \(d \geqslant 0\)?} & |[block]| {\(d = \paren*{\frac{p}{2} \cdot \frac{p}{2}} - q\)} & |[subprogram]| {\(v = \sqrt{d}\)} \\
-            |[block]| {\(n_0 = \texttt{infinity}\)} & & & |[block]| {\(n_0 = 2\) \\ \(x_{1, \text{Re}} = -\frac{p}{2}\) \\ \(x_{2, \text{Re}} = -\frac{p}{2}\) \\ \(x_{1,\text{Im}} = w\) \\ \(x_{2,\text{Im}} = -w\)} & |[block]| {\(n = 1, x_1 = -\frac{p}{2} \)} & |[subprogram]| {\(w = \sqrt{d}\)} & & |[block]| {\(w = p' \cdot v\)} \\
+            |[decision]| {Ist \(c = 0\)?} & |[block]| {\(n_0 = 0\)} & |[block]| {\(n_0 = 1, x_{1,\text{Re}} = -\frac{c}{b}\)} & |[subprogram]| {\(w = \sqrt{-d}\)} & |[decision]| {Ist \(d = 0\)?} & |[decision]| {Ist \(d \geqslant 0\)?} & |[block]| {\(d = \paren*{\frac{p}{2} \cdot \frac{p}{2}} - q\)} & |[subprogram]| {\(v = \sqrt{d}\)} \\
+            |[block]| {\(n_0 = \texttt{infinity}\)} & & & |[block]| {\(n_0 = 2\) \\ \(x_{1, \text{Re}} = -\frac{p}{2}\) \\ \(x_{2, \text{Re}} = -\frac{p}{2}\) \\ \(x_{1,\text{Im}} = w\) \\ \(x_{2,\text{Im}} = -w\)} & |[block]| {\(n = 1, x_{1,\text{Re}} = -\frac{p}{2} \)} & |[subprogram]| {\(w = \sqrt{d}\)} & & |[block]| {\(w = p' \cdot v\)} \\
             & & & & & |[block]| {\(n = 2\)} \\
-            & & & & & |[decision]| {Ist \(p > 0\)?} & |[block]| {\(x_2 = -\frac{p}{2} - w\)} \\
-            & & & & & |[block]| {\(x_1 = -\frac{p}{2} + w\)} & |[block]| {\(x_1 = \frac{q}{x_2}\)} \\
-            & & & & & |[block]| {\(x_2 = \frac{q}{x_1}\)} \\
+            & & & & & |[decision]| {Ist \(p > 0\)?} & |[block]| {\(x_{2, \text{Re}} = -\frac{p}{2} - w\)} \\
+            & & & & & |[block]| {\(x_{1,\text{Re}} = -\frac{p}{2} + w\)} & |[block]| {\(x_{1,\text{Re}} = \frac{q}{x_{2, \text{Re}}}\)} \\
+            & & & & & |[block]| {\(x_{2, \text{Re}} = \frac{q}{x_{1,\text{Re}}}\)} \\
             |[start]| {Ende} \\
         };
     
