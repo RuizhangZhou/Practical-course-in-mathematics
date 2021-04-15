@@ -54,11 +54,10 @@ int main() {
                 }else{
                     real=-p/2;imagin=sqrt(-discriminant); 
                     checkSolution(2,true,real,imagin);
-                    
                 }
             }else{
-                discriminant=1/4-q/p/p;
-                cout<<discriminant<<endl;
+                discriminant=0.25-q/p/p;
+                //cout<<discriminant<<endl;
                 if(discriminant==0){
                     checkSolution(1,false,-p/2);
                 }else if(c==0){
@@ -75,10 +74,8 @@ int main() {
                     real=-p/2;imagin=abs(p)*sqrt(-discriminant);
                     checkSolution(2,true,real,imagin);
                 }
-            }
-            
+            }  
         }
-        
     }
     return 0;
 }
