@@ -59,7 +59,7 @@ unique_ptr<Roots> calculate_roots(const Polynomial &poly) {
                 double value = 0.25 - (q / p) / p;
                 if (value >= 0) {
                     return {abs(p) * sqrt(value), 0};
-                } else {
+                } else { // Unnötig
                     return {0, abs(p) * sqrt(-value)};
                 }
             } else {
