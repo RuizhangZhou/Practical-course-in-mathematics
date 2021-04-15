@@ -46,6 +46,14 @@ void determineZeros(polynom &pol) {
 
         double p = pol.b/pol.a;
         double q = pol.c/pol.a;
+        
+        if(p==0 && q==0) {
+            pol.is_complex = false;
+            pol.num = 1;
+            pol.x1 = 0;
+            return;
+        }
+
         double squareroot;
         if(abs(p)/2 <= sqrt(DBL_MAX)) {
             if(pow(p/2,2)-q >= 0) {
@@ -66,13 +74,10 @@ void determineZeros(polynom &pol) {
         if(p > 0) {
             pol.x2 = -(p/2) - squareroot;
             pol.x1 = q/pol.x2;
-        } else if (p <0) {
+        } else {
             pol.x1 = -(p/2) + squareroot;
             pol.x2 = q/pol.x1;
-        } else {
-            pol.x1 = squareroot;
-            pol.x2 = -squareroot;
-        } 
+        }
 
         if (pol.x1 == pol.x2) {
             pol.num = 1;
@@ -85,10 +90,10 @@ void determineZeros(polynom &pol) {
 }
 
 int main() {
-    // Hier kommt nun Ihr Programm. Viel Erfolg!
     polynom pol;
     for(int i = 1; i <= num_examples; i++) {
         getExample(i, pol.a, pol.b, pol.c);
+        cout << pol.a << " " << pol.b << " " << pol.c << endl;
         determineZeros(pol);
         
         if(pol.num == infinity) {
