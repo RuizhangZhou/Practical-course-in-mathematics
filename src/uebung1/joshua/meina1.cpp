@@ -55,11 +55,11 @@ unique_ptr<Roots> calculate_roots(const Polynomial &poly) {
         double q = poly.c / poly.a;
 
         auto calculate_sqrt_pq = [](double p, double q) -> Imaginary {
-            if (abs(p) > SQRT_DBL_MAX) {
+            if (abs(p / 2) > SQRT_DBL_MAX) {
                 double value = 0.25 - (q / p) / p;
                 if (value >= 0) {
                     return {abs(p) * sqrt(value), 0};
-                } else {
+                } else { // Unnötig
                     return {0, abs(p) * sqrt(-value)};
                 }
             } else {

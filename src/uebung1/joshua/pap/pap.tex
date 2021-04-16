@@ -1,0 +1,178 @@
+% PREAMBLE
+\documentclass[preview, border=10pt, ngerman]{standalone}
+\usepackage{babel}
+
+% PACKAGES
+% Math
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{dsfont}
+% Typesetting
+\usepackage{fontspec}
+\usepackage{microtype}
+% Layout
+\usepackage[margin=0cm]{geometry}
+% Miscellanous
+\usepackage{array} % for advanced tabular etc.
+\usepackage{listings} % for code inclusion
+\usepackage{csquotes} % for \enquote{}
+\usepackage{enumitem} % for \begin{enumerate}[label=\alph*]
+\usepackage{tikz} % for \begin{tikzpicture}
+\usepackage{forest} % for trees
+\usepackage{hyperref} % for clickable reflinks
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\lvalue}{\llbracket}{\rrbracket}
+\DeclarePairedDelimiter{\dia}{\langle}{\rangle}
+\DeclarePairedDelimiter{\paren}{\lparen}{\rparen}
+
+\usetikzlibrary{matrix,shapes,arrows,positioning,chains,calc}
+\tikzset{
+    decision/.style={
+        diamond,
+        draw,
+        text width=10em,
+        aspect=2,
+        anchor=center,
+    },
+    block/.style={
+        rectangle,
+        draw,
+        text width=10em,
+        text centered,
+        anchor=center,
+    },
+    subprogram/.style={
+        rectangle,
+        draw,
+        inner xsep=1em,
+        text width=9em,
+        text centered,
+        anchor=center,
+        path picture={\draw (path picture bounding box.north west) -- ++ (0.3,0) |- (path picture bounding box.south west); \draw (path picture bounding box.north east) -- ++ (-0.3,0) |- (path picture bounding box.south east);}
+    },
+    start/.style={
+        rectangle,
+        draw,
+        text width=10em,
+        text centered,
+        rounded corners,
+        anchor=center,
+    },
+    cloud/.style={
+        draw,
+        ellipse,
+        minimum height=2em,
+        anchor=center,
+    },
+    descr/.style={
+        fill=white,
+        inner sep=2.5pt
+    },
+    connector/.style={
+        -latex,
+        font=\scriptsize
+    },
+    rectangle connector/.style={
+        connector,
+        to path={(\tikztostart) -- ++(#1,0pt) \tikztonodes |- (\tikztotarget) },
+        pos=0.5
+    },
+    rectangle connector/.default=-2cm,
+    straight connector/.style={
+        connector,
+        to path=--(\tikztotarget) \tikztonodes
+    }
+}
+\begin{document}
+    Vorab: Das Polynom wird als \(p(x) = ax^2 + bx + c\) geschrieben, nach der Normalisierung als \(x^2 + px + q\). \(n_0\) ist die Anzahl der Nullstellen. \\
+    \begin{tikzpicture}
+        \matrix [matrix of nodes, column  sep=2cm,row  sep=8mm, align=center] (m) {
+            |[start]| {Start} & \\
+            |[block]| {\(n_0 = 0\) \\ \(x_{1, \text{Re}} = 0\) \\ \(x_{2, \text{Re}} = 0\) \\ \(x_{1,\text{Im}} = 0\) \\ \(x_{2,\text{Im}} = 0\)} \\
+            |[decision]| {Ist \(p(x)\) konstant?} & & |[decision]| {Ist \(p(x)\) linear?} & |[block]| {\(p = \frac{b}{a}, q = \frac{c}{a}\)} & |[subprogram]| {\(s = \sqrt{\texttt{DBL\_MAX}}\)} & |[subprogram]| {\(p' = \abs{p}\)} & |[decision]| {Gilt \(\frac{p'}{2} > s\)?} & |[block]| {\(d = 0.25 - \frac{\frac{q}{p}}{p}\)} \\
+            |[decision]| {Ist \(c = 0\)?} & |[block]| {\(n_0 = 0\)} & |[block]| {\(n_0 = 1, x_{1,\text{Re}} = -\frac{c}{b}\)} & |[subprogram]| {\(w = \sqrt{-d}\)} & |[decision]| {Ist \(d = 0\)?} & |[decision]| {Ist \(d \geqslant 0\)?} & |[block]| {\(d = \paren*{\frac{p}{2} \cdot \frac{p}{2}} - q\)} & |[subprogram]| {\(v = \sqrt{d}\)} \\
+            |[block]| {\(n_0 = \texttt{infinity}\)} & & & |[block]| {\(n_0 = 2\) \\ \(x_{1, \text{Re}} = -\frac{p}{2}\) \\ \(x_{2, \text{Re}} = -\frac{p}{2}\) \\ \(x_{1,\text{Im}} = w\) \\ \(x_{2,\text{Im}} = -w\)} & |[block]| {\(n = 1, x_{1,\text{Re}} = -\frac{p}{2} \)} & |[subprogram]| {\(w = \sqrt{d}\)} & & |[block]| {\(w = p' \cdot v\)} \\
+            & & & & & |[block]| {\(n = 2\)} \\
+            & & & & & |[decision]| {Ist \(p > 0\)?} & |[block]| {\(x_{2, \text{Re}} = -\frac{p}{2} - w\)} \\
+            & & & & & |[block]| {\(x_{1,\text{Re}} = -\frac{p}{2} + w\)} & |[block]| {\(x_{1,\text{Re}} = \frac{q}{x_{2, \text{Re}}}\)} \\
+            & & & & & |[block]| {\(x_{2, \text{Re}} = \frac{q}{x_{1,\text{Re}}}\)} \\
+            |[start]| {Ende} \\
+        };
+    
+        \draw [->] (m-1-1.south) -- (m-2-1.north);
+        \draw [->] (m-2-1.south) -- (m-3-1.north);
+        \draw [->] (m-3-1.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-3-3.west);
+        \draw [->] (m-3-1.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-4-1.north);
+        \draw [->] (m-4-1.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-4-2.west);
+        \draw [->] (m-4-1.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-1.north);
+        
+        \draw [->] (m-3-3.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-3-4.west);
+        \draw [->] (m-3-3.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-4-3.north);
+        
+        \draw [->] (m-3-4.east) -- (m-3-5.west);
+        \draw [->] (m-3-5.east) -- (m-3-6.west);
+        \draw [->] (m-3-6.east) -- (m-3-7.west);
+        
+        \draw [->] (m-3-7.east) -- ++ (0.5, 0) node [above] {Ja} -- (m-3-8.west);
+        \draw [->] (m-3-7.south) -- ++ (0, -0.2) node [right] {Nein} -- (m-4-7.north);
+        
+        \draw [->] (m-4-7.west) -- (m-4-6.east);
+        
+        \draw [->] (m-4-6.west) -- ++ (-0.5, 0) node [above] {Nein} -- (m-4-5.east);
+        \draw [->] (m-4-6.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-6.north);
+        
+        \draw [->] (m-4-5.west) -- ++ (-0.5, 0) node [above] {Nein} -- (m-4-4.east);
+        \draw [->] (m-4-5.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-5.north);
+        
+        \draw [->] (m-4-4.south) -- (m-5-4.north);
+        
+        \path (m-5-6.south) -- (m-6-6.north) coordinate [midway] (m66a);
+        \draw [->] (m-5-6.south) -- (m66a);
+        \draw [->] (m66a) -- (m-6-6.north);
+        
+        \draw [->] (m-3-8.south) -- (m-4-8.north);
+        \draw [->] (m-4-8.south) -- (m-5-8.north);
+        \draw [->] (m-5-8.south) |- (m66a);
+        
+        \draw [->] (m-6-6.south) -- (m-7-6.north);
+        
+        \draw [->] (m-7-6.east) -- ++ (0.5, 0) node [above] {Ja} -- (m-7-7.west);
+        \draw [->] (m-7-6.south) -- ++ (0, -0.2) node [right] {Nein} -- (m-8-6.north);
+        
+        \draw [->] (m-8-6.south) -- (m-9-6.north);
+        
+        \draw [->] (m-7-7.south) -- (m-8-7.north);
+        
+        \path let \p1 = (m-10-1.north), \p2 = (m-9-6.south) in coordinate (m91s) at (\x1,\y2);
+        \path (m91s) -- (m-10-1.north) coordinate [midway] (m91m);
+        \draw [->] (m91m) -- (m-10-1.north);
+        
+        \path let \p1 = (m-4-2.south), \p2 = (m91m) in coordinate (m92m) at (\x1,\y2);
+        \path let \p1 = (m-4-3.south), \p2 = (m91m) in coordinate (m93m) at (\x1,\y2);
+        \path let \p1 = (m-5-4.south), \p2 = (m91m) in coordinate (m94m) at (\x1,\y2);
+        \path let \p1 = (m-5-5.south), \p2 = (m91m) in coordinate (m95m) at (\x1,\y2);
+        \path let \p1 = (m-9-6.south), \p2 = (m91m) in coordinate (m96m) at (\x1,\y2);
+        
+        \draw [->] (m-8-7.south) |- (m96m);
+        \draw [->] (m96m) -- (m95m);
+        \draw [->] (m95m) -- (m94m);
+        \draw [->] (m94m) -- (m93m);
+        \draw [->] (m93m) -- (m92m);
+        \draw [->] (m92m) -- (m91m);
+        
+        \draw [->] (m-5-1.south) -- (m91m);
+        \draw [->] (m-4-2.south) -- (m92m);
+        \draw [->] (m-4-3.south) -- (m93m);
+        \draw [->] (m-5-4.south) -- (m94m);
+        \draw [->] (m-5-5.south) -- (m95m);
+        \draw [->] (m-9-6.south) -- (m96m);
+        
+        \draw [->] let \p1 = (m-4-2.south), \p2 = (m91m) in (m-4-2.south) -- (\x1,\y2);
+        
+    \end{tikzpicture}
+\end{document}
