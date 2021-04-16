@@ -36,6 +36,7 @@
         diamond,
         draw,
         text width=10em,
+        inner sep=0em,
         aspect=2,
         anchor=center,
     },
@@ -61,6 +62,15 @@
         text width=10em,
         text centered,
         rounded corners,
+        anchor=center,
+    },
+    io/.style={
+        trapezium,
+        draw,
+        trapezium left angle=60,
+        trapezium right angle=120,
+        text width=9em,
+        text centered,
         anchor=center,
     },
     cloud/.style={
@@ -93,86 +103,91 @@
     \begin{tikzpicture}
         \matrix [matrix of nodes, column  sep=2cm,row  sep=8mm, align=center] (m) {
             |[start]| {Start} & \\
+            |[io]| {Eingabe: \(a, b, c\)} \\
             |[block]| {\(n_0 = 0\) \\ \(x_{1, \text{Re}} = 0\) \\ \(x_{2, \text{Re}} = 0\) \\ \(x_{1,\text{Im}} = 0\) \\ \(x_{2,\text{Im}} = 0\)} \\
-            |[decision]| {Ist \(p(x)\) konstant?} & & |[decision]| {Ist \(p(x)\) linear?} & |[block]| {\(p = \frac{b}{a}, q = \frac{c}{a}\)} & |[subprogram]| {\(s = \sqrt{\texttt{DBL\_MAX}}\)} & |[subprogram]| {\(p' = \abs{p}\)} & |[decision]| {Gilt \(\frac{p'}{2} > s\)?} & |[block]| {\(d = 0.25 - \frac{\frac{q}{p}}{p}\)} \\
+            |[decision]| {Ist \(p(x)\) konstant? (Gilt \(a = 0\) und \(b = 0\)?)} & & |[decision]| {Ist \(p(x)\) linear? (Gilt \(a = 0\)?)} & |[block]| {\(p = \frac{b}{a}, q = \frac{c}{a}\)} & |[subprogram]| {\(s = \sqrt{\texttt{DBL\_MAX}}\)} & |[subprogram]| {\(p' = \abs{p}\)} & |[decision]| {Gilt \(\frac{p'}{2} > s\)?} & |[block]| {\(d = 0.25 - \frac{\frac{q}{p}}{p}\)} \\
             |[decision]| {Ist \(c = 0\)?} & |[block]| {\(n_0 = 0\)} & |[block]| {\(n_0 = 1, x_{1,\text{Re}} = -\frac{c}{b}\)} & |[subprogram]| {\(w = \sqrt{-d}\)} & |[decision]| {Ist \(d = 0\)?} & |[decision]| {Ist \(d \geqslant 0\)?} & |[block]| {\(d = \paren*{\frac{p}{2} \cdot \frac{p}{2}} - q\)} & |[subprogram]| {\(v = \sqrt{d}\)} \\
             |[block]| {\(n_0 = \texttt{infinity}\)} & & & |[block]| {\(n_0 = 2\) \\ \(x_{1, \text{Re}} = -\frac{p}{2}\) \\ \(x_{2, \text{Re}} = -\frac{p}{2}\) \\ \(x_{1,\text{Im}} = w\) \\ \(x_{2,\text{Im}} = -w\)} & |[block]| {\(n_0 = 1, x_{1,\text{Re}} = -\frac{p}{2} \)} & |[subprogram]| {\(w = \sqrt{d}\)} & & |[block]| {\(w = p' \cdot v\)} \\
             & & & & & |[block]| {\(n_0 = 2\)} \\
             & & & & & |[decision]| {Ist \(p > 0\)?} & |[block]| {\(x_{2, \text{Re}} = -\frac{p}{2} - w\)} \\
             & & & & & |[block]| {\(x_{1,\text{Re}} = -\frac{p}{2} + w\)} & |[block]| {\(x_{1,\text{Re}} = \frac{q}{x_{2, \text{Re}}}\)} \\
             & & & & & |[block]| {\(x_{2, \text{Re}} = \frac{q}{x_{1,\text{Re}}}\)} \\
+            |[io]| {Ausgabe: \(n_0, x_{1,\text{Re}}, x_{2,\text{Re}}\), \(x_{1,\text{Im}}, x_{2,\text{Im}}\)} \\
             |[start]| {Ende} \\
         };
     
         \draw [->] (m-1-1.south) -- (m-2-1.north);
         \draw [->] (m-2-1.south) -- (m-3-1.north);
-        \draw [->] (m-3-1.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-3-3.west);
-        \draw [->] (m-3-1.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-4-1.north);
-        \draw [->] (m-4-1.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-4-2.west);
+        \draw [->] (m-3-1.south) -- (m-4-1.north);
+        \draw [->] (m-4-1.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-4-3.west);
         \draw [->] (m-4-1.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-1.north);
+        \draw [->] (m-5-1.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-5-2.west);
+        \draw [->] (m-5-1.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-6-1.north);
         
-        \draw [->] (m-3-3.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-3-4.west);
-        \draw [->] (m-3-3.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-4-3.north);
+        \draw [->] (m-4-3.east) -- ++ (0.5, 0) node [above] {Nein} -- (m-4-4.west);
+        \draw [->] (m-4-3.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-3.north);
         
-        \draw [->] (m-3-4.east) -- (m-3-5.west);
-        \draw [->] (m-3-5.east) -- (m-3-6.west);
-        \draw [->] (m-3-6.east) -- (m-3-7.west);
+        \draw [->] (m-4-4.east) -- (m-4-5.west);
+        \draw [->] (m-4-5.east) -- (m-4-6.west);
+        \draw [->] (m-4-6.east) -- (m-4-7.west);
         
-        \draw [->] (m-3-7.east) -- ++ (0.5, 0) node [above] {Ja} -- (m-3-8.west);
-        \draw [->] (m-3-7.south) -- ++ (0, -0.2) node [right] {Nein} -- (m-4-7.north);
+        \draw [->] (m-4-7.east) -- ++ (0.5, 0) node [above] {Ja} -- (m-4-8.west);
+        \draw [->] (m-4-7.south) -- ++ (0, -0.2) node [right] {Nein} -- (m-5-7.north);
         
-        \draw [->] (m-4-7.west) -- (m-4-6.east);
+        \draw [->] (m-5-7.west) -- (m-5-6.east);
         
-        \draw [->] (m-4-6.west) -- ++ (-0.5, 0) node [above] {Nein} -- (m-4-5.east);
-        \draw [->] (m-4-6.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-6.north);
+        \draw [->] (m-5-6.west) -- ++ (-0.5, 0) node [above] {Nein} -- (m-5-5.east);
+        \draw [->] (m-5-6.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-6-6.north);
         
-        \draw [->] (m-4-5.west) -- ++ (-0.5, 0) node [above] {Nein} -- (m-4-4.east);
-        \draw [->] (m-4-5.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-5-5.north);
+        \draw [->] (m-5-5.west) -- ++ (-0.5, 0) node [above] {Nein} -- (m-5-4.east);
+        \draw [->] (m-5-5.south) -- ++ (0, -0.2) node [right] {Ja} -- (m-6-5.north);
         
-        \draw [->] (m-4-4.south) -- (m-5-4.north);
+        \draw [->] (m-5-4.south) -- (m-6-4.north);
         
-        \path (m-5-6.south) -- (m-6-6.north) coordinate [midway] (m66a);
-        \draw [->] (m-5-6.south) -- (m66a);
-        \draw [->] (m66a) -- (m-6-6.north);
+        \path (m-6-6.south) -- (m-7-6.north) coordinate [midway] (m76a);
+        \draw [->] (m-6-6.south) -- (m76a);
+        \draw [->] (m76a) -- (m-7-6.north);
         
-        \draw [->] (m-3-8.south) -- (m-4-8.north);
         \draw [->] (m-4-8.south) -- (m-5-8.north);
-        \draw [->] (m-5-8.south) |- (m66a);
+        \draw [->] (m-5-8.south) -- (m-6-8.north);
+        \draw [->] (m-6-8.south) |- (m76a);
         
-        \draw [->] (m-6-6.south) -- (m-7-6.north);
+        \draw [->] (m-7-6.south) -- (m-8-6.north);
         
-        \draw [->] (m-7-6.east) -- ++ (0.5, 0) node [above] {Ja} -- (m-7-7.west);
-        \draw [->] (m-7-6.south) -- ++ (0, -0.2) node [right] {Nein} -- (m-8-6.north);
+        \draw [->] (m-8-6.east) -- ++ (0.5, 0) node [above] {Ja} -- (m-8-7.west);
+        \draw [->] (m-8-6.south) -- ++ (0, -0.2) node [right] {Nein} -- (m-9-6.north);
         
-        \draw [->] (m-8-6.south) -- (m-9-6.north);
+        \draw [->] (m-9-6.south) -- (m-10-6.north);
         
-        \draw [->] (m-7-7.south) -- (m-8-7.north);
+        \draw [->] (m-8-7.south) -- (m-9-7.north);
         
-        \path let \p1 = (m-10-1.north), \p2 = (m-9-6.south) in coordinate (m91s) at (\x1,\y2);
-        \path (m91s) -- (m-10-1.north) coordinate [midway] (m91m);
-        \draw [->] (m91m) -- (m-10-1.north);
+        \path let \p1 = (m-11-1.north), \p2 = (m-10-6.south) in coordinate (m101s) at (\x1,\y2);
+        \path (m101s) -- (m-11-1.north) coordinate [midway] (m101m);
+        \draw [->] (m101m) -- (m-11-1.north);
         
-        \path let \p1 = (m-4-2.south), \p2 = (m91m) in coordinate (m92m) at (\x1,\y2);
-        \path let \p1 = (m-4-3.south), \p2 = (m91m) in coordinate (m93m) at (\x1,\y2);
-        \path let \p1 = (m-5-4.south), \p2 = (m91m) in coordinate (m94m) at (\x1,\y2);
-        \path let \p1 = (m-5-5.south), \p2 = (m91m) in coordinate (m95m) at (\x1,\y2);
-        \path let \p1 = (m-9-6.south), \p2 = (m91m) in coordinate (m96m) at (\x1,\y2);
+        \path let \p1 = (m-5-2.south), \p2 = (m101m) in coordinate (m102m) at (\x1,\y2);
+        \path let \p1 = (m-5-3.south), \p2 = (m101m) in coordinate (m103m) at (\x1,\y2);
+        \path let \p1 = (m-6-4.south), \p2 = (m101m) in coordinate (m104m) at (\x1,\y2);
+        \path let \p1 = (m-6-5.south), \p2 = (m101m) in coordinate (m105m) at (\x1,\y2);
+        \path let \p1 = (m-10-6.south), \p2 = (m101m) in coordinate (m106m) at (\x1,\y2);
         
-        \draw [->] (m-8-7.south) |- (m96m);
-        \draw [->] (m96m) -- (m95m);
-        \draw [->] (m95m) -- (m94m);
-        \draw [->] (m94m) -- (m93m);
-        \draw [->] (m93m) -- (m92m);
-        \draw [->] (m92m) -- (m91m);
+        \draw [->] (m-9-7.south) |- (m106m);
+        \draw [->] (m106m) -- (m105m);
+        \draw [->] (m105m) -- (m104m);
+        \draw [->] (m104m) -- (m103m);
+        \draw [->] (m103m) -- (m102m);
+        \draw [->] (m102m) -- (m101m);
         
-        \draw [->] (m-5-1.south) -- (m91m);
-        \draw [->] (m-4-2.south) -- (m92m);
-        \draw [->] (m-4-3.south) -- (m93m);
-        \draw [->] (m-5-4.south) -- (m94m);
-        \draw [->] (m-5-5.south) -- (m95m);
-        \draw [->] (m-9-6.south) -- (m96m);
+        \draw [->] (m-6-1.south) -- (m101m);
+        \draw [->] (m-5-2.south) -- (m102m);
+        \draw [->] (m-5-3.south) -- (m103m);
+        \draw [->] (m-6-4.south) -- (m104m);
+        \draw [->] (m-6-5.south) -- (m105m);
+        \draw [->] (m-10-6.south) -- (m106m);
         
-        \draw [->] let \p1 = (m-4-2.south), \p2 = (m91m) in (m-4-2.south) -- (\x1,\y2);
+        \draw [->] let \p1 = (m-5-2.south), \p2 = (m101m) in (m-5-2.south) -- (\x1,\y2);
+        
+        \draw [->] (m-11-1.south) -- (m-12-1.north);
         
     \end{tikzpicture}
 \end{document}
