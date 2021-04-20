@@ -15,7 +15,15 @@ void selectionsort(size_t &length, unsigned int *&array) {
 }
 
 void insertionsort(size_t &length, unsigned int *&array) {
-
+    if (length > 1) {
+        for (size_t i = 1; i < length; i++) {
+            size_t j = i;
+            while (j > 0 and array[j - 1] > array[j]) {
+                swap(array, j - 1, j);
+                j--;
+            }
+        }
+    }
 }
 
 void heapsort(size_t &length, unsigned int *&array) {
