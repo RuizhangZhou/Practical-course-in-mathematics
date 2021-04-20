@@ -26,6 +26,10 @@ void quicksort(size_t &length, unsigned int *&array) {
 
 }
 
+void quicksort_median3(size_t &length, unsigned int *&array) {
+
+}
+
 void mergesort(size_t &length, unsigned int *&array) {
 
 }
@@ -79,6 +83,15 @@ int main(int argc, char *argv[]) {
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 quicksort(*length, *array);
+                checkSolution(*array);
+            }
+        } else if (std::strcmp(argv[1], "-q3") == 0) {
+            cout << "Quicksort Median 3" << endl;
+            auto length = new size_t;
+            auto array = new unsigned int *;
+            for (size_t i = 1; i <= num_examples; i++) {
+                getExample(i, *length, *array);
+                quicksort_median3(*length, *array);
                 checkSolution(*array);
             }
         } else if (std::strcmp(argv[1], "-m") == 0) {
