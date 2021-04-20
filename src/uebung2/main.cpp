@@ -30,8 +30,34 @@ void heapsort(size_t &length, unsigned int *&array) {
 
 }
 
-void quicksort(size_t &length, unsigned int *&array) {
+void quicksort_recursive_call(size_t &length, unsigned int *&array, size_t left, size_t right) {
+    size_t old_left = left;
+    size_t pivot = right;
+    right--;
+    while (left < right) {
+        while (left < pivot and array[left] < array[pivot]) {
+            left++;
+        }
+        while (old_left < right and array[right] >= array[pivot]) {
+            right--;
+        }
+        if (left < right) {
+            swap(array, left, right);
+        }
+    }
+    if (array[left] > array[pivot]) {
+        swap(array, left, pivot);
+    }
+    if (left - old_left > 1) {
+        quicksort_recursive_call(length, array, old_left, left - 1);
+    }
+    if (pivot - left > 1) {
+        quicksort_recursive_call(length, array, left + 1, pivot);
+    }
+}
 
+void quicksort(size_t &length, unsigned int *&array) {
+    quicksort_recursive_call(length, array, 0, length - 1);
 }
 
 void quicksort_median3(size_t &length, unsigned int *&array) {
