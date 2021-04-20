@@ -60,8 +60,41 @@ void quicksort(size_t &length, unsigned int *&array) {
     quicksort_recursive_call(length, array, 0, length - 1);
 }
 
-void quicksort_median3(size_t &length, unsigned int *&array) {
+void quicksort_median_3_recursive_call(size_t &length, unsigned int *&array, size_t left, size_t right) {
+    size_t mid = left + (right - left) / 2;
+    if (array[left] < array[mid] < array[right] or array[right] < array[mid] < array[left]) {
+        swap(array, mid, right);
+    } else if (array[mid] < array[left] < array[right] or array[right] < array[left] < array[mid]) {
+        swap(array, left, right);
+    }
 
+    size_t old_left = left;
+    size_t pivot = right;
+    right--;
+    while (left < right) {
+        while (left < pivot and array[left] < array[pivot]) {
+            left++;
+        }
+        while (old_left < right and array[right] >= array[pivot]) {
+            right--;
+        }
+        if (left < right) {
+            swap(array, left, right);
+        }
+    }
+    if (array[left] > array[pivot]) {
+        swap(array, left, pivot);
+    }
+    if (left - old_left > 1) {
+        quicksort_median_3_recursive_call(length, array, old_left, left - 1);
+    }
+    if (pivot - left > 1) {
+        quicksort_median_3_recursive_call(length, array, left + 1, pivot);
+    }
+}
+
+void quicksort_median3(size_t &length, unsigned int *&array) {
+    quicksort_median_3_recursive_call(length, array, 0, length - 1);
 }
 
 void mergesort(size_t &length, unsigned int *&array) {
