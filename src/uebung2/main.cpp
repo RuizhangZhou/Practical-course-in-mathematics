@@ -62,9 +62,9 @@ void quicksort(size_t &length, unsigned int *&array) {
 
 void quicksort_median_3_recursive_call(size_t &length, unsigned int *&array, size_t left, size_t right) {
     size_t mid = left + (right - left) / 2;
-    if (array[left] < array[mid] < array[right] or array[right] < array[mid] < array[left]) {
+    if ((array[left] <= array[mid] and array[mid] < array[right]) or (array[right] < array[mid] and array[mid] <= array[left])) {
         swap(array, mid, right);
-    } else if (array[mid] < array[left] < array[right] or array[right] < array[left] < array[mid]) {
+    } else if ((array[mid] <= array[left] and array[left] < array[right]) or (array[right] < array[left] and array[left] <= array[mid])) {
         swap(array, left, right);
     }
 
