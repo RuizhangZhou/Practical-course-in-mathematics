@@ -11,7 +11,15 @@ void bubblesort(size_t &length, unsigned int *&array) {
 }
 
 void selectionsort(size_t &length, unsigned int *&array) {
-
+    for (size_t i = 0; i < length-1; i++) {
+        size_t minPosition = i;
+        for (size_t j = i+1; j < length; j++) {
+            if (array[j] < array[minPosition]) {
+                minPosition = j;
+            }
+        }
+        swap(array, i, minPosition);
+    }
 }
 
 void insertionsort(size_t &length, unsigned int *&array) {
@@ -26,8 +34,34 @@ void insertionsort(size_t &length, unsigned int *&array) {
     }
 }
 
-void heapsort(size_t &length, unsigned int *&array) {
+void heapify(size_t &length, unsigned int *&array, size_t i) {
+    size_t maxPosition = i;
 
+    if (2*i+1 < length && array[2*i+1] > array[maxPosition]) {
+        maxPosition = 2*i+1;
+    }
+    if (2*i+2 < length && array[2*i+2] > array[maxPosition]) {
+        maxPosition = 2*i+2;
+    }
+
+    if (maxPosition != i) {
+        swap(array, maxPosition, i);
+        heapify(length, array, maxPosition);
+    }
+}
+
+void heapsort(size_t &length, unsigned int *&array) {
+    size_t leftSize = length;
+
+    for (int i = length/2 - 1; i >= 0; i--) {
+        heapify(length, array, i);
+    }
+
+    while (leftSize > 1) {
+        swap(array, 0, leftSize - 1);
+        leftSize--;
+        heapify(leftSize, array, 0);
+    }
 }
 
 void quicksort_recursive_call(size_t &length, unsigned int *&array, size_t left, size_t right) {
