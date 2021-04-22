@@ -7,7 +7,13 @@ using namespace std;
 
 
 void bubblesort(size_t &length, unsigned int *&array) {
-
+    for(int i=length-1;i>0;i--){
+        for(int j=0;j<i;j++){
+            if(array[j]>array[j+1]){
+                swap(array,j,j+1);
+            }
+        }
+    }
 }
 
 void selectionsort(size_t &length, unsigned int *&array) {
@@ -131,8 +137,48 @@ void quicksort_median3(size_t &length, unsigned int *&array) {
     quicksort_median_3_recursive_call(length, array, 0, length - 1);
 }
 
-void mergesort(size_t &length, unsigned int *&array) {
+void merge(size_t l1,size_t l2,unsigned int *array1, unsigned int *array2,unsigned int *array){
+    int i,j,k=0;
+    while(i<l1 && j<l2){
+        if(array1[i]<=array2[j]){
+            array[k++]=array1[i++];
+        }else{
+            array[k++]=array2[j++];
+        }
+    }
+    while(i<l1){
+        array[k++]=array1[i++];
+    }
+    while(j<l2){
+        array[k++]=array2[j++];
+    }
+    return ;
+}
 
+void mergesort(size_t length, unsigned int *array) {
+    if(length<=1) {
+        return;
+    }
+    size_t l1,l2;
+    unsigned int *array1,*array2;
+    l1=(length+1)/2;
+    l2=length-l1;
+    array1=new unsigned int[l1];
+    array2=new unsigned int[l2];
+    for(int i=0;i<l1;i++){
+        array1[i]=array[i];
+    }
+    for(int i=l1;i<length;i++){
+        array2[i-l1]=array[i];
+    }
+    mergesort(l1,array1);
+    mergesort(l2,array2);
+    merge(l1,l2,array1,array2,array);
+    
+    delete [] array1;
+    delete [] array2;
+    
+    return;
 }
 
 
@@ -197,12 +243,22 @@ int main(int argc, char *argv[]) {
             }
         } else if (std::strcmp(argv[1], "-m") == 0) {
             cout << "Mergesort" << endl;
-            auto length = new size_t;
-            auto array = new unsigned int *;
+            size_t length;
+            unsigned int *array;
+            unsigned int *copyArray;
             for (size_t i = 1; i <= num_examples; i++) {
-                getExample(i, *length, *array);
-                mergesort(*length, *array);
-                checkSolution(*array);
+                getExample(i, length, array);
+                
+                copyArray=new unsigned int[length];
+                for(int i=0;i<length;i++){
+                    copyArray[i]=array[i];
+                } 
+                mergesort(length,copyArray);
+                for(int i=0;i<length;i++){
+                    array[i]=copyArray[i];
+                } 
+                checkSolution(array);
+                delete [] copyArray;
             }
         } else {
             return 2;
