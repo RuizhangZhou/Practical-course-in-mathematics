@@ -156,7 +156,9 @@ void merge(size_t l1, size_t l2, unsigned int *&array1, unsigned int *&array2, u
     }
 }
 
-void mergesort(size_t &length, unsigned int *&array) {
+void mergesort(size_t &length, unsigned int *&array) {//what's the meaning of *&array here? 
+                                                      //*: "array" is a pointer which points to the type unsigned int; &: It's call by reference here?
+                                                      //why it's *&array but not &*array?
     if (length <= 1) {
         return;
     }
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]) {
         } else if (std::strcmp(argv[1], "-s") == 0) {
             cout << "Selection sort" << endl;
             auto length = new size_t;
-            auto array = new unsigned int *;
+            auto array = new unsigned int *; 
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 selectionsort(*length, *array);
@@ -255,12 +257,23 @@ int main(int argc, char *argv[]) {
         } else if (std::strcmp(argv[1], "-m") == 0) {
             cout << "Mergesort" << endl;
             auto length = new size_t;
-            auto array = new unsigned int *;
+            //size_t *length; //'std::bad_alloc', but what's the difference? 
+                              //Why "new" here don't need to delete[], but the normal assignment would bring out space problem?
+
+            auto array = new unsigned int *;//datatype of array here: **int, the pointer of pointer which points to the type unsigned int
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 mergesort(*length, *array);
                 checkSolution(*array);
             }
+
+            // auto array = new unsigned int;
+            // for (size_t i = 1; i <= num_examples; i++) {
+            //     getExample(i, *length, array);
+            //     mergesort(*length, array);
+            //     checkSolution(array);
+            // }       //This seems also work out
+
         } else {
             print_usage();
             return 2;
