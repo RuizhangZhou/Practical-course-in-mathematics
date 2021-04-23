@@ -7,19 +7,19 @@ using namespace std;
 
 
 void bubblesort(size_t &length, unsigned int *&array) {
-    for(size_t i=length-1;i>0;i--){
-        for(size_t j=0;j<i;j++){
-            if(array[j]>array[j+1]){
-                swap(array,j,j+1);
+    for (size_t i = length - 1; i > 0; i--) {
+        for (size_t j = 0; j < i; j++) {
+            if (array[j] > array[j + 1]) {
+                swap(array, j, j + 1);
             }
         }
     }
 }
 
 void selectionsort(size_t &length, unsigned int *&array) {
-    for (size_t i = 0; i < length-1; i++) {
+    for (size_t i = 0; i < length - 1; i++) {
         size_t minPosition = i;
-        for (size_t j = i+1; j < length; j++) {
+        for (size_t j = i + 1; j < length; j++) {
             if (array[j] < array[minPosition]) {
                 minPosition = j;
             }
@@ -43,11 +43,11 @@ void insertionsort(size_t &length, unsigned int *&array) {
 void heapify(size_t &length, unsigned int *&array, size_t i) {
     size_t maxPosition = i;
 
-    if (2*i+1 < length && array[2*i+1] > array[maxPosition]) {
-        maxPosition = 2*i+1;
+    if (2 * i + 1 < length && array[2 * i + 1] > array[maxPosition]) {
+        maxPosition = 2 * i + 1;
     }
-    if (2*i+2 < length && array[2*i+2] > array[maxPosition]) {
-        maxPosition = 2*i+2;
+    if (2 * i + 2 < length && array[2 * i + 2] > array[maxPosition]) {
+        maxPosition = 2 * i + 2;
     }
 
     if (maxPosition != i) {
@@ -59,7 +59,7 @@ void heapify(size_t &length, unsigned int *&array, size_t i) {
 void heapsort(size_t &length, unsigned int *&array) {
     size_t leftSize = length;
 
-    for (int i = (int)length/2 - 1; i >= 0; i--) {
+    for (int i = (int) length / 2 - 1; i >= 0; i--) {
         heapify(length, array, i);
     }
 
@@ -102,9 +102,11 @@ void quicksort(size_t &length, unsigned int *&array) {
 
 void quicksort_median_3_recursive_call(size_t &length, unsigned int *&array, size_t left, size_t right) {
     size_t mid = left + (right - left) / 2;
-    if ((array[left] <= array[mid] and array[mid] < array[right]) or (array[right] < array[mid] and array[mid] <= array[left])) {
+    if ((array[left] <= array[mid] and array[mid] < array[right]) or
+        (array[right] < array[mid] and array[mid] <= array[left])) {
         swap(array, mid, right);
-    } else if ((array[mid] <= array[left] and array[left] < array[right]) or (array[right] < array[left] and array[left] <= array[mid])) {
+    } else if ((array[mid] <= array[left] and array[left] < array[right]) or
+               (array[right] < array[left] and array[left] <= array[mid])) {
         swap(array, left, right);
     }
 
@@ -137,45 +139,45 @@ void quicksort_median3(size_t &length, unsigned int *&array) {
     quicksort_median_3_recursive_call(length, array, 0, length - 1);
 }
 
-void merge(size_t l1,size_t l2,unsigned int *&array1, unsigned int *&array2,unsigned int *&array){
-    size_t i = 0,j = 0,k=0;
-    while(i<l1 && j<l2){
-        if(array1[i]<=array2[j]){
-            array[k++]=array1[i++];
-        }else{
-            array[k++]=array2[j++];
+void merge(size_t l1, size_t l2, unsigned int *&array1, unsigned int *&array2, unsigned int *&array) {
+    size_t i = 0, j = 0, k = 0;
+    while (i < l1 && j < l2) {
+        if (array1[i] <= array2[j]) {
+            array[k++] = array1[i++];
+        } else {
+            array[k++] = array2[j++];
         }
     }
-    while(i<l1){
-        array[k++]=array1[i++];
+    while (i < l1) {
+        array[k++] = array1[i++];
     }
-    while(j<l2){
-        array[k++]=array2[j++];
+    while (j < l2) {
+        array[k++] = array2[j++];
     }
 }
 
 void mergesort(size_t &length, unsigned int *&array) {
-    if(length<=1) {
+    if (length <= 1) {
         return;
     }
-    size_t l1,l2;
-    unsigned int *array1,*array2;
-    l1=(length+1)/2;
-    l2=length-l1;
-    array1=new unsigned int[l1];
-    array2=new unsigned int[l2];
-    for(size_t i=0;i<l1;i++){
-        array1[i]=array[i];
+    size_t l1, l2;
+    unsigned int *array1, *array2;
+    l1 = (length + 1) / 2;
+    l2 = length - l1;
+    array1 = new unsigned int[l1];
+    array2 = new unsigned int[l2];
+    for (size_t i = 0; i < l1; i++) {
+        array1[i] = array[i];
     }
-    for(size_t i=l1;i<length;i++){
-        array2[i-l1]=array[i];
+    for (size_t i = l1; i < length; i++) {
+        array2[i - l1] = array[i];
     }
-    mergesort(l1,array1);
-    mergesort(l2,array2);
-    merge(l1,l2,array1,array2,array);
+    mergesort(l1, array1);
+    mergesort(l2, array2);
+    merge(l1, l2, array1, array2, array);
 
-    delete [] array1;
-    delete [] array2;
+    delete[] array1;
+    delete[] array2;
 }
 
 
