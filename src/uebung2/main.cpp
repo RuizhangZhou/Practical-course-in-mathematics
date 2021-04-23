@@ -7,8 +7,8 @@ using namespace std;
 
 
 void bubblesort(size_t &length, unsigned int *&array) {
-    for(int i=length-1;i>0;i--){
-        for(int j=0;j<i;j++){
+    for(size_t i=length-1;i>0;i--){
+        for(size_t j=0;j<i;j++){
             if(array[j]>array[j+1]){
                 swap(array,j,j+1);
             }
@@ -59,7 +59,7 @@ void heapify(size_t &length, unsigned int *&array, size_t i) {
 void heapsort(size_t &length, unsigned int *&array) {
     size_t leftSize = length;
 
-    for (int i = length/2 - 1; i >= 0; i--) {
+    for (int i = (int)length/2 - 1; i >= 0; i--) {
         heapify(length, array, i);
     }
 
@@ -138,7 +138,7 @@ void quicksort_median3(size_t &length, unsigned int *&array) {
 }
 
 void merge(size_t l1,size_t l2,unsigned int *&array1, unsigned int *&array2,unsigned int *&array){
-    int i = 0,j = 0,k=0;
+    size_t i = 0,j = 0,k=0;
     while(i<l1 && j<l2){
         if(array1[i]<=array2[j]){
             array[k++]=array1[i++];
@@ -164,10 +164,10 @@ void mergesort(size_t &length, unsigned int *&array) {
     l2=length-l1;
     array1=new unsigned int[l1];
     array2=new unsigned int[l2];
-    for(int i=0;i<l1;i++){
+    for(size_t i=0;i<l1;i++){
         array1[i]=array[i];
     }
-    for(int i=l1;i<length;i++){
+    for(size_t i=l1;i<length;i++){
         array2[i-l1]=array[i];
     }
     mergesort(l1,array1);
