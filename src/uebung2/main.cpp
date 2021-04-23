@@ -180,9 +180,21 @@ void mergesort(size_t &length, unsigned int *&array) {
     delete[] array2;
 }
 
+void print_usage() {
+    cerr << "Usage:" << endl;
+    cerr << "    -b:  Bubble sort" << endl;
+    cerr << "    -s:  Selection sort" << endl;
+    cerr << "    -i:  Insertion sort" << endl;
+    cerr << "    -h:  Heapsort" << endl;
+    cerr << "    -q:  Quicksort" << endl;
+    cerr << "    -q3: Quicksort with median of three values" << endl;
+    cerr << "    -m:  Mergesort" << endl;
+}
+
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
+        print_usage();
         return 1;
     } else {
         if (std::strcmp(argv[1], "-b") == 0) {
@@ -250,6 +262,7 @@ int main(int argc, char *argv[]) {
                 checkSolution(*array);
             }
         } else {
+            print_usage();
             return 2;
         }
     }
