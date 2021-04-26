@@ -94,6 +94,29 @@ void quicksort_recursive_call(size_t &length, unsigned int *&array, size_t left,
     if (pivot - left > 1) {
         quicksort_recursive_call(length, array, left + 1, pivot);
     }
+
+    // from Rick: I also try another way to implment the quicksort here, but seems doesn't work. What's wrong here?   
+    /*
+    if(left<right){
+        size_t old_left = left;
+        size_t pivot = right;
+        right--;    
+        while(left<right){
+            while(left<right && array[left]<array[pivot]){
+                left++;
+            }
+            while(right>left && array[right]>array[pivot]){
+                right--;
+            }
+            if(left<right){
+                swap(array,left,right);
+            } 
+        }
+        swap(array,left,pivot);
+        quicksort_recursive_call(length,array,old_left,left-1);
+        quicksort_recursive_call(length,array,left+1,pivot);
+    }
+    */
 }
 
 void quicksort(size_t &length, unsigned int *&array) {
