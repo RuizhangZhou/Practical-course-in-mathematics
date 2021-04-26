@@ -227,8 +227,6 @@ int main(int argc, char *argv[]) {
             }
         } else if (std::strcmp(argv[1], "-i") == 0) {
             cout << "Insertion sort" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 insertionsort(*length, *array);
