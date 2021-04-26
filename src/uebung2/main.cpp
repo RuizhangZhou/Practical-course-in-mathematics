@@ -197,28 +197,22 @@ int main(int argc, char *argv[]) {
         print_usage();
         return 1;
     } else {
+        auto length = new size_t(0);
+        auto array = new unsigned int *;
         if (std::strcmp(argv[1], "-b") == 0) {
             cout << "Bubble sort" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 bubblesort(*length, *array);
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else if (std::strcmp(argv[1], "-s") == 0) {
             cout << "Selection sort" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 selectionsort(*length, *array);
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else if (std::strcmp(argv[1], "-i") == 0) {
             cout << "Insertion sort" << endl;
             auto length = new size_t(0);
@@ -233,52 +227,40 @@ int main(int argc, char *argv[]) {
             delete array;
         } else if (std::strcmp(argv[1], "-h") == 0) {
             cout << "Heapsort" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 heapsort(*length, *array);
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else if (std::strcmp(argv[1], "-q") == 0) {
             cout << "Quicksort" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 quicksort(*length, *array);
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else if (std::strcmp(argv[1], "-q3") == 0) {
             cout << "Quicksort Median 3" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 quicksort_median3(*length, *array);
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else if (std::strcmp(argv[1], "-m") == 0) {
             cout << "Mergesort" << endl;
-            auto length = new size_t(0);
-            auto array = new unsigned int *;
             for (size_t i = 1; i <= num_examples; i++) {
                 getExample(i, *length, *array);
                 mergesort(*length, *array);
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else {
             print_usage();
+            delete length;
+            delete array;
             return 2;
         }
+        delete length;
+        delete array;
     }
 
     return 0;
