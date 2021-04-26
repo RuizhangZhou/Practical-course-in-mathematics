@@ -235,8 +235,6 @@ int main(int argc, char *argv[]) {
                 cout << *length << endl;
                 checkSolution(*array);
             }
-            delete length;
-            delete array;
         } else if (std::strcmp(argv[1], "-h") == 0) {
             cout << "Heapsort" << endl;
             for (size_t i = 1; i <= num_examples; i++) {
