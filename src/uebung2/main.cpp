@@ -181,7 +181,8 @@ void mergesort(size_t &length, unsigned int *&array) {
 }
 
 void print_usage() {
-    cerr << "Usage:" << endl;
+    cerr << "Usage: <program name> <x> [length]" << endl;
+    cerr << "Where <x> is one of:" << endl;
     cerr << "    -b:  Bubble sort" << endl;
     cerr << "    -s:  Selection sort" << endl;
     cerr << "    -i:  Insertion sort" << endl;
@@ -189,15 +190,26 @@ void print_usage() {
     cerr << "    -q:  Quicksort" << endl;
     cerr << "    -q3: Quicksort with median of three values" << endl;
     cerr << "    -m:  Mergesort" << endl;
+    cerr << "And [length] is the length of the array that is to be sorted. This parameter is optional." << endl;
 }
 
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
+    if (argc != 2 and argc != 3) {
         print_usage();
         return 1;
     } else {
-        auto length = new size_t(0);
+        size_t *length;
+        if (argc == 2) {
+            length = new size_t(0);
+        } else {
+            try {
+                length = new size_t(stoi(argv[2]));
+            } catch (const invalid_argument& e) {
+                print_usage();
+                return 3;
+            }
+        }
         auto array = new unsigned int *;
         if (std::strcmp(argv[1], "-b") == 0) {
             cout << "Bubble sort" << endl;
