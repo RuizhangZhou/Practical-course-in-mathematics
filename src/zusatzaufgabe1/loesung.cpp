@@ -30,7 +30,7 @@ double detIntegralEqui(double a, double b, double epsilon, int &equiCounter,int 
     return sum;
 }
 
-double detIntegralAdap(double a, double b, double fa, double fb, double epsilon, int &adapCounter, int &intervalCounter,double &minDistant) {
+double detIntegralAdap(double a, double b, double fa, double fb, double epsilon, int &adapCounter, int &intervalCounter,int curInterval) {
     double im, it;
     double fab2 = f((a+b)/2.0);
     adapCounter += 3;
@@ -39,13 +39,12 @@ double detIntegralAdap(double a, double b, double fa, double fb, double epsilon,
     if (abs(im-it) <= epsilon) {
         return detSimpsonIntegral(a, b, fa, fb, fab2);
     } else {
-        if((b-a)/2.0<minDistant){//I use your recursion to calculate the minimale Schrittweite, which is required for adaptive Algorithmus here,
+        if(curInterval*2>intervalCounter){//I use your recursion to calculate the minimale Schrittweite, which is required for adaptive Algorithmus here,
         //so that I don't need to calculate all the functionsvalue and compare with epsilon again to get this Schrittweite in detIntegralEqui
             intervalCounter*=2;
-            minDistant/=2;
         }
-        return detIntegralAdap(a, (a+b)/2.0, fa, fab2, epsilon/2.0, adapCounter,intervalCounter,minDistant) 
-        + detIntegralAdap((a+b)/2, b, fab2, fb, epsilon/2.0, adapCounter, intervalCounter, minDistant);
+        return detIntegralAdap(a, (a+b)/2.0, fa, fab2, epsilon/2.0, adapCounter,intervalCounter,curInterval*2) 
+        + detIntegralAdap((a+b)/2, b, fab2, fb, epsilon/2.0, adapCounter, intervalCounter, curInterval*2);
     }
 }
 
@@ -66,10 +65,9 @@ int main(int argc, char *argv[]) {
     }
 
     getExample(ex_id, a, b, epsilon);
-    double minDistant=b-a;
     double fa = f(a), fb = f(b);
 
-    integral = detIntegralAdap(a, b, fa, fb, epsilon, adapCounter, intervalCounter,minDistant);
+    integral = detIntegralAdap(a, b, fa, fb, epsilon, adapCounter, intervalCounter,1);
     checkSolution(integral);
     
     integral = detIntegralEqui(a, b, epsilon, equiCounter,intervalCounter);
