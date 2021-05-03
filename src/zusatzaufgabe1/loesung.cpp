@@ -18,20 +18,30 @@ double detSimpsonIntegral(double a, double b, double fa, double fb, double fab2)
     return (b-a) * (1.0/6.0 * fa + 4.0/6.0 * fab2 + 1.0/6.0 * fb);
 }
 
-double detIntegralEqui(double a, double b, double epsilon, int &equiCounter) {
-    return 0;
+double detIntegralEqui(double a, double b, int intervalCounter) {
+    double h = (b-a)/intervalCounter;
+    double sum = 0.5 * (f(a) + f(b));
+    for (int j = 1;j <= intervalCounter - 1; j++){
+        sum += f(a + j * h);
+    }
+    sum *= h;
+    return sum;
 }
 
-double detIntegralAdap(double a, double b, double fa, double fb, double epsilon, int &adapCounter) {
+double detIntegralAdap(double a, double b, double fa, double fb, double epsilon, int &intervalCounter, int curInterval) {
     double im, it;
     double fab2 = f((a+b)/2.0);
-    adapCounter += 3;
     im = detCenterIntegral(a, b, fab2);
     it = detTrapezeIntegral(a, b, fa, fb);
     if (abs(im-it) <= epsilon) {
         return detSimpsonIntegral(a, b, fa, fb, fab2);
     } else {
-        return detIntegralAdap(a, (a+b)/2.0, fa, fab2, epsilon/2.0, adapCounter) + detIntegralAdap((a+b)/2, b, fab2, fb, epsilon/2.0, adapCounter);
+        if(curInterval*2>intervalCounter){//I use your recursion to calculate the minimale Schrittweite, which is required for adaptive Algorithmus here,
+        //so that I don't need to calculate all the functionsvalue and compare with epsilon again to get this Schrittweite in detIntegralEqui
+            intervalCounter *= 2;
+        }
+        return detIntegralAdap(a, (a+b)/2.0, fa, fab2, epsilon/2.0, intervalCounter, curInterval*2) 
+        + detIntegralAdap((a+b)/2, b, fab2, fb, epsilon/2.0, intervalCounter, curInterval*2);
     }
 }
 
@@ -40,7 +50,7 @@ int main(int argc, char *argv[]) {
     double a, b, epsilon;
     int ex_id;
     double integral;
-    int equiCounter = 0, adapCounter = 0;
+    int intervalCounter = 1;
 
     cout << "Welches Beispiel soll gerechnet werden?" << endl;
     cin >> ex_id;
@@ -52,14 +62,11 @@ int main(int argc, char *argv[]) {
     }
 
     getExample(ex_id, a, b, epsilon);
-    
     double fa = f(a), fb = f(b);
 
-    integral = detIntegralAdap(a, b, fa, fb, epsilon, adapCounter);
+    integral = detIntegralAdap(a, b, fa, fb, epsilon, intervalCounter, 1);
     checkSolution(integral);
     
-    integral = detIntegralEqui(a, b, epsilon, equiCounter);
+    integral = detIntegralEqui(a, b, intervalCounter);
     checkSolution(integral);
-
-    cout << "Bei der aequidistanten Unterteilung wurden " << equiCounter - adapCounter << " Funktionsauswertungen mehr benoetigt." << endl;
 }
