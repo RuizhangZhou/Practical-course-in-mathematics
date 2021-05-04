@@ -12,6 +12,6 @@ student.o: student.cpp student.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
-	rm -f student.o sort.o sort
+	rm -f student.o main.out main.o
 
 .PHONY: clean
