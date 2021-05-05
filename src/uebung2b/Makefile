@@ -1,5 +1,8 @@
 CXXFLAGS = -O0 -g -std=c++17 -Wall -Wextra -Wpedantic
 
+run: main.out
+	./$^
+
 all: main.out
 
 main.out: main.o unit.o student.o
