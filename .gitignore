@@ -525,3 +525,4 @@ $RECYCLE.BIN/
 
 !**/unit.o
 !**/IGL.o
+!**/test_mv.o
