@@ -3,15 +3,20 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2
 
 .PHONY: clean
 
-A3: #Hier fehlt was
-	#Hier fehlt was
+run: main.out
+	./main.out
 
-meine_loesung.o: #Hier fehlt was
-	#Hier fehlt was
+all: main.out
+
+main.out: main.o vector.o sparse_matrix.o
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+main.o: main.cpp vector.o sparse_matrix.o
+	$(CXX) $(CXXFLAGS) -c $<
 
 test_mv: vector.o sparse_matrix.o test_mv.o
 	$(CXX) $(CXXFLAGS) -o $@ vector.o sparse_matrix.o test_mv.o
-	
+
 sparse_matrix.o: sparse_matrix.cpp sparse_matrix.h vector.h
 	$(CXX) $(CXXFLAGS) -c $<
 
@@ -19,5 +24,4 @@ vector.o: vector.cpp vector.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
-	rm -f A3 meine_loesung.o vector.o sparse_matrix.o
-
+	rm -f main.o vector.o sparse_matrix.o main.out
