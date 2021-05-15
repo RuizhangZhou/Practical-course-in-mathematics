@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2
 
-.PHONY: clean test_mv run_test
+.PHONY: clean test_mv run_test test run_test
 
 run: main.out
 	./main.out
@@ -12,6 +12,17 @@ run_test_mv: test_mv.out
 	./test_mv.out
 
 test_mv: test_mv.out
+
+run_test: test.out
+	./test.out
+
+test: test.out
+
+test.out: test.o vector.o sparse_matrix.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+test.o: test.cpp vector.o sparse_matrix.o
+	$(CXX) $(CXXFLAGS) -c $<
 
 main.out: main.o vector.o sparse_matrix.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
