@@ -156,5 +156,13 @@ int main(int argc, char* argv[]) {
     checkSolution(*doubles);
     checkSolution(*strings);
 
+    auto tmp = make_unique<Student>();
+    tmp->first_name = "Hallo";
+    auto vec = make_unique<vector<Student>>();
+    vec->push_back(*tmp);
+    tmp->first_name = "Test";
+    cout << *tmp << endl;
+    cout << (*vec)[0] << endl;
+
     return 0;
 }
