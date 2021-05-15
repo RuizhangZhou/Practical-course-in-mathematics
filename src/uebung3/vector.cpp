@@ -10,6 +10,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
+#include <memory>
+#include <array>
 
 // =======================
 //      Konstruktoren
@@ -22,10 +24,9 @@ Vector::Vector(size_t l) {
     if (l <= 0) vecError("Nur Vektoren mit positiver Laenge!");
 #endif
 
-    length = l;
-
-    vec = new double[l];
-    if (vec == NULL) vecError("Nicht genuegend Speicher!");
+    vec = make_unique<vector<double>>(l);
+    length = vec->size();
+    if (vec == nullptr) vecError("Nicht genuegend Speicher!");
 
     for (size_t i = 0; i < l; i++) (*this)(i) = 0;
 }
@@ -39,12 +40,10 @@ Vector::~Vector() {
 // ----- Kopierkonstruktor -----
 
 Vector::Vector(const Vector &x) {
-    length = x.length;
-
-    vec = new double[length];
-    if (vec == NULL) vecError("Nicht genuegend Speicher!");
-
-    for (size_t i = 0; i < length; i++) (*this)(i) = x(i);
+    vec = make_unique<vector<double>>(x.vec->size());
+    if (vec == nullptr) vecError("Nicht genuegend Speicher!");
+    length = vec->size();
+    for (size_t i = 0; i < x.vec->size(); i++) (*this)(i) = x(i);
 }
 
 // ===========================================
@@ -55,20 +54,20 @@ Vector::Vector(const Vector &x) {
 
 double &Vector::operator()(size_t i) {
 #ifndef NDEBUG
-    if (i >= length) vecError("Ungueltiger Index!");
+    if (i >= vec->size()) vecError("Ungueltiger Index!");
 #endif
 
-    return vec[i];
+    return (*vec)[i];
 }
 
 // ----- Lesezugriff auf Elemente eines const Vektors -----
 
 double Vector::operator()(size_t i) const {
 #ifndef NDEBUG
-    if (i >= length) vecError("Ungueltiger Index!");
+    if (i >= vec->size()) vecError("Ungueltiger Index!");
 #endif
 
-    return vec[i];
+    return (*vec)[i];
 }
 
 // =====================
@@ -78,14 +77,12 @@ double Vector::operator()(size_t i) const {
 // ----- Zuweisungsoperator "=" ----
 
 Vector &Vector::operator=(const Vector &x) {
-    if (length != x.length) {
-        delete[] vec;
-        length = x.getLength();
-        vec = new (std::nothrow) double[length];
-        if (vec == NULL) vecError("Nicht genuegend Speicher!");
+    if (vec->size() != x.vec->size()) {
+        vec = make_unique<vector<double>>(vec->size());
+        if (vec == nullptr) vecError("Nicht genuegend Speicher!");
     }
-
-    for (size_t i = 0; i < length; i++) (*this)(i) = x(i);
+    length = vec->size();
+    for (size_t i = 0; i < vec->size(); i++) (*this)(i) = x(i);
 
     return *this;
 }
@@ -93,25 +90,43 @@ Vector &Vector::operator=(const Vector &x) {
 // ----- Zuweisungsoperator mit Addition "+=" ----
 
 Vector &Vector::operator+=(const Vector &x) {
-    // ***** Hier fehlt was *****
+    if (vec->size() != x.vec->size()) {
+        vecError("Ungleiche Länge");
+    }
+    for (size_t i = 0; i < vec->size(); i++) {
+        (*this)(i) += x(i);
+    }
+    return *this;
 }
 
 // ----- Zuweisungsoperator mit Subtraktion "-=" ----
 
 Vector &Vector::operator-=(const Vector &x) {
-    // ***** Hier fehlt was *****
+    if (vec->size() != x.vec->size()) {
+        vecError("Ungleiche Länge");
+    }
+    for (size_t i = 0; i < vec->size(); i++) {
+        (*this)(i) -= x(i);
+    }
+    return *this;
 }
 
 // ----- Zuweisungsoperator mit Multiplikation "*=" ----
 
 Vector &Vector::operator*=(double c) {
-    // ***** Hier fehlt was *****
+    for (size_t i = 0; i < vec->size(); i++) {
+        (*this)(i) *= c;
+    }
+    return *this;
 }
 
 // ----- Zuweisungsoperator mit Divsion "/=" ----
 
 Vector &Vector::operator/=(double c) {
-    // ***** Hier fehlt was *****
+    for (size_t i = 0; i < vec->size(); i++) {
+        (*this)(i) /= c;
+    }
+    return *this;
 }
 
 // ==============================
@@ -121,7 +136,10 @@ Vector &Vector::operator/=(double c) {
 // ----- Vektorlaenge aendern -----
 
 Vector &Vector::redim(size_t l) {
-    // ***** Hier fehlt was *****
+    vec = make_unique<vector<double>>(l);
+    length = vec->size();
+    for (size_t i = 0; i < l; i++) (*this)(i) = 0;
+    return (*this);
 }
 
 // ======================
@@ -131,13 +149,21 @@ Vector &Vector::redim(size_t l) {
 // ----- Euklidische Norm -----
 
 double Vector::norm2() const {
-    // ***** Hier fehlt was *****
+    double norm = 0;
+    for (const double i : *vec) {
+        norm += i * i;
+    }
+    return sqrt(norm);
 }
 
 // ----- Maximum-Norm -----
 
 double Vector::normMax() const {
-    // ***** Hier fehlt was *****
+    double norm = abs((*vec)[0]);
+    for (const double i : *vec) {
+        norm = max(norm, abs(i));
+    }
+    return norm;
 }
 
 // ==================================
@@ -147,43 +173,76 @@ double Vector::normMax() const {
 // ----- Addition "+" -----
 
 Vector operator+(const Vector &x, const Vector &y) {
-    // ***** Hier fehlt was *****
+    auto vec = make_unique<Vector>(x.vec->size());
+    if (x.vec->size() != y.vec->size()) {
+
+    }
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = x(i) + y(i);
+    }
+    return *vec;
 }
 
 // ----- Subtraktion "-" -----
 
 Vector operator-(const Vector &x, const Vector &y) {
-    // ***** Hier fehlt was *****
+    auto vec = make_unique<Vector>(x.vec->size());
+    if (x.vec->size() != y.vec->size()) {
+
+    }
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = x(i) - y(i);
+    }
+    return *vec;
 }
 
 // ----- Vorzeichen wechseln "-" -----
 
 Vector operator-(const Vector &x) {
-    // ***** Hier fehlt was *****
+    auto vec = make_unique<Vector>(x.vec->size());
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = -x(i);
+    }
+    return *vec;
 }
 
 // ----- Skalarprodukt "*" -----
 
 double operator*(const Vector &x, const Vector &y) {
-    // ***** Hier fehlt was *****
+    double scalar = 0;
+    if (x.vec->size() != y.vec->size()) {
+        Vector::vecError("Ungleiche Länge");
+    }
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        scalar += x(i) * y(i);
+    }
+    return scalar;
 }
 
 // ----- Multiplikation Skalar*Vector "*" -----
 
 Vector operator*(double c, const Vector &x) {
-    // ***** Hier fehlt was *****
+    auto vec = make_unique<Vector>(x.vec->size());
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = x(i) * c;
+    }
+    return *vec;
 }
 
 // ----- Multiplikation Vector*Skalar "*" -----
 
 Vector operator*(const Vector &x, double c) {
-    // ***** Hier fehlt was *****
+    return c * x;
 }
 
 // ----- Division Vector/Skalar "/" -----
 
 Vector operator/(const Vector &x, double c) {
-    // ***** Hier fehlt was *****
+    auto vec = make_unique<Vector>(x.vec->size());
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = x(i) / c;
+    }
+    return *vec;
 }
 
 // ----- Division Vector/Vector "/"  <-->  D^(-1)*x -----
@@ -195,7 +254,14 @@ Vector operator/(const Vector &x, const Vector &d) {
 // ----- Vector*.Vector "%"  <--> komponentenweise Multiplikation -----
 
 Vector operator%(const Vector &x, const Vector &d) {
-    // ***** Hier fehlt was *****
+    auto vec = make_unique<Vector>(x.vec->size());
+    if (x.vec->size() != d.vec->size()) {
+
+    }
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = x(i) * d(i);
+    }
+    return *vec;
 }
 
 // ==============================
@@ -205,10 +271,11 @@ Vector operator%(const Vector &x, const Vector &d) {
 // ----- Test auf Gleichheit "==" -----
 
 bool operator==(const Vector &x, const Vector &y) {
-    if (x.length != y.length) return false;
+    if (x.vec->size() != y.vec->size()) return false;
 
-    for (size_t i = 0; i < x.length; i++)
+    for (size_t i = 0; i < x.vec->size(); i++) {
         if (x(i) != y(i)) return false;
+    }
 
     return true;
 }
@@ -216,7 +283,13 @@ bool operator==(const Vector &x, const Vector &y) {
 // ----- Test auf Ungleichheit "!=" -----
 
 bool operator!=(const Vector &x, const Vector &y) {
-    // ***** Hier fehlt was *****
+    if (x.vec->size() != y.vec->size()) return true;
+
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        if (x(i) != y(i)) return true;
+    }
+
+    return false;
 }
 
 // ==========================
@@ -227,7 +300,7 @@ bool operator!=(const Vector &x, const Vector &y) {
 
 std::ostream &operator<<(std::ostream &s, const Vector &x) {
     s << std::setiosflags(std::ios::right);
-    for (size_t i = 0; i < x.length; i++) s << "\n(" << std::setw(4) << i << ") " << x(i);
+    for (size_t i = 0; i < x.vec->size(); i++) s << "\n(" << std::setw(4) << i << ") " << x(i);
 
     return s << std::endl;
 }
@@ -236,7 +309,7 @@ std::ostream &operator<<(std::ostream &s, const Vector &x) {
 
 std::istream &operator>>(std::istream &s, Vector &x) {
     std::cout << std::setiosflags(std::ios::right);
-    for (size_t i = 0; i < x.length; i++) {
+    for (size_t i = 0; i < x.vec->size(); i++) {
         std::cout << "\n(" << std::setw(4) << i << ") ";
         s >> x(i);
     }

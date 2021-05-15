@@ -7,13 +7,17 @@
 #define _VECTOR_H
 
 #include <iostream>
+#include <vector>
+#include <memory>
+
+using namespace std;
 
 class Sparse_Matrix;  // fuer friend Matrix * Vector etc.
 
 class Vector {
    private:
-    double* vec;    // Zeiger auf Feld fuer Vektorelemente
-    size_t length;  // Vektorlaenge
+    unique_ptr<vector<double>> vec;
+    size_t length; // Apparently needed because for some reason test_mv uses this variable, although getLength is defined.
 
     static void vecError(const char str[]);  // Fehlermeldung ausgeben
 
@@ -33,7 +37,7 @@ class Vector {
 
     Vector& redim(size_t);  // neue Laenge festlegen
     size_t getLength() const {
-        return length;
+        return (size_t) vec->size();
     }                        // Laenge
     double norm2() const;    // Euklidische Norm des Vektors
     double normMax() const;  // Maximum-Norm des Vektors
