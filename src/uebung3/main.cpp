@@ -23,16 +23,16 @@ bool istStrengDiagonalDominant(Sparse_Matrix &A){
     return true;
 }
 
-void gesamtschrittverfahren(Sparse_Matrix &A,Vector &x0,Vector &b,double tol,int &max_iter){
+int gsv(Sparse_Matrix &A,const Vector &b,Vector &x0,const int &k_max,double &eps){
+    Sparse_Matrix originalA=A;
+    if(A.getCols()<1||A.getCols()!=A.getRows()||A.getCols()!=b.getLength()||A.getCols()!=x0.getLength()){
+        return -1;
+    }
     size_t n=A.getCols();
-
-    //Sparse_Matrix A_L(n,n), A_R(n,n);
+    
     Vector d(n);
     for(int row=1;row<=n;row++){
-        // for(int col=1;col<row;col++){
-        //     A_L.put(row,col,A.get(row,col));
-        //     A_R.put(col,row,A.get(col,row));
-        // }
+        
         d(row-1)=A.get(row,row);//as d ist a str::vector, index begin from 0
         A.put(row,row,0);//A=A_L+A_R, we don't need to creat new A_L and A_R
     }
@@ -42,14 +42,23 @@ void gesamtschrittverfahren(Sparse_Matrix &A,Vector &x0,Vector &b,double tol,int
     Vector residuenvektor;
     while(true){
         residuenvektor=b-A*xk;
-        if(iterCount<max_iter && residuenvektor.norm2()<tol){
-            xk=residuenvektor/d;
-            iterCount++;
+        if(iterCount<k_max){
+            if(residuenvektor.norm2()>=eps){
+                xk=residuenvektor/d;
+                iterCount++;
+            }else{
+                break;
+            }
         }else{
-            break;
+            return 0;
         }
+        
+        
     }
     checkSolution(xk,iterCount,0);//0 for GSV
+    A=originalA;
+    //Beim gsv darf A modifiziert werden, muss aber beim Verlassen der Funktion wieder wie beim Eingang besetzt sein.
+    return iterCount;
 }
 
 int main() {
@@ -58,12 +67,16 @@ int main() {
     double tol;
     int max_iter;
     for(int id=1;id<=num_examples;id++){
-        getExample(id,A,x0,b,tol,max_iter);
-
+        getExample(id,A,x0,b,tol,max_iter); 
         if(istStrengDiagonalDominant(A)){
-            gesamtschrittverfahren(A,x0,b,tol,max_iter);
+            int res=gsv(A,b,x0,max_iter,tol);
+            if(res==0){
+                cout<<max_iter<<" Iterationen erreicht"<<endl;
+            }else if(res==-1){
+                cout<<"Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
+            }
         }
-
+         
 
 
 
