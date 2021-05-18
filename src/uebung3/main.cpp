@@ -117,7 +117,7 @@ int cg(const Sparse_Matrix &A,const Vector &b, Vector &x0, const int k_max, doub
                 xk+=ak*dk;
                 rk-=ak*Adk;
                 double rk1norm2=rk.norm2();
-                double bk=pow(rk1norm2,2)/rknorm2;
+                double bk=pow(rk1norm2/rknorm2,2);
                 rknorm2=rk1norm2;
                 dk=rk+bk*dk;
 
