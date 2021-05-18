@@ -40,4 +40,4 @@ vector.o: vector.cpp vector.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
-	rm -f main.o vector.o sparse_matrix.o main.out test_mv.out
+	rm -f main.o vector.o sparse_matrix.o main.out test_mv.out test.o test.out
