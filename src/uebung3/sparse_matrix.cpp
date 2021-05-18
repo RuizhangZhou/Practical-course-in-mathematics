@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
+#include <iostream>
 
 
 // =======================
@@ -29,10 +30,8 @@ Sparse_Matrix::Sparse_Matrix(const Sparse_Matrix &M) {
     rows = M.getRows();
     cols = M.getCols();
 
-    hashmap_t mat;
-
     for (std::pair<coord_t, double> entry : M.mat) {
-        mat[entry.first] = entry.second;
+       mat[entry.first] = entry.second;
     }
 }
 
@@ -375,7 +374,7 @@ bool operator!=(const Sparse_Matrix &A, const Sparse_Matrix &B) {
 
 // ----- Ausgabe "<<" -----
 
-std::ostream& operator>>(std::ostream &s, const Sparse_Matrix &A) {
+std::ostream& operator<<(std::ostream &s, const Sparse_Matrix &A) {
     s << std::setiosflags(std::ios::right);
     
     for (size_t i = 0; i < A.getRows(); i++) {
@@ -386,7 +385,7 @@ std::ostream& operator>>(std::ostream &s, const Sparse_Matrix &A) {
         s << "\n";
     }
 
-    return s << std::endl;
+    return s;
 }
 
 // ----- Eingabe ">>" -----
@@ -416,3 +415,21 @@ void Sparse_Matrix::matError(const char str[]) {
     std::cerr << "\nMatrixfehler: " << str << '\n' << std::endl;
     std::abort();
 }
+
+/* int main() {
+    Sparse_Matrix A(3,3);
+    Sparse_Matrix B(3,3);
+    Sparse_Matrix C;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            A.put(i, j, i+j);
+            B.put(i, j, i-j);
+        }
+    }
+
+    std::cout << A << std::endl;
+    std::cout << B << std::endl;
+    C = A + B;
+    std::cout << C << std::endl;
+    return 0;
+} */
