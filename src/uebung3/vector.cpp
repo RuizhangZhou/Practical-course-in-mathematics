@@ -78,7 +78,7 @@ double Vector::operator()(size_t i) const {
 
 Vector &Vector::operator=(const Vector &x) {
     if (vec->size() != x.vec->size()) {
-        vec = make_unique<vector<double>>(vec->size());
+        vec = make_unique<vector<double>>(x.vec->size());
         if (vec == nullptr) vecError("Nicht genuegend Speicher!");
     }
     length = vec->size();
