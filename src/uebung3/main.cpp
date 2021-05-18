@@ -9,9 +9,9 @@ using namespace std;
 bool istStrengDiagonalDominant(Sparse_Matrix &A){
     size_t n=A.getCols();
 
-    for(size_t row=1;row<=n;row++){
+    for(size_t row=0;row<=n-1;row++){
         double sumOfRow=0;
-        for(size_t col=1;col<=n;col++){
+        for(size_t col=0;col<=n-1;col++){
             if(row!=col){
                 sumOfRow+=abs(A.get(row,col));
             }
@@ -33,9 +33,9 @@ int gsv(Sparse_Matrix &A,const Vector &b,Vector &x0,const int &k_max,double &eps
     Sparse_Matrix originalA=Sparse_Matrix(A);//Kopierkonstuktor
     //but according to the last paragraph in paper, we can't use implement by create extra matrix or vector?
     
-    for(size_t row=1;row<=n;row++){
+    for(size_t row=0;row<=n-1;row++){
         
-        d(row-1)=A.get(row,row);//as d is a str::vector, index begin from 0
+        d(row)=A.get(row,row);//as d is a str::vector, index begin from 0
         A.put(row,row,0);//set the dianoal to 0
         //not A=A_L+A_R, so that we don't need to creat new A_L and A_R
     }
@@ -49,7 +49,7 @@ int gsv(Sparse_Matrix &A,const Vector &b,Vector &x0,const int &k_max,double &eps
             return 0;
         }else{
             Vector Residuenvektor=zwischenspeichert;
-            for(size_t i=1;i<=n;i++){
+            for(size_t i=0;i<=n-1;i++){
                 Residuenvektor(i)-=d(i)*xk(i);
             }
             if(Residuenvektor.norm2()>=eps){//here we need to use the zwischenspeichert
@@ -73,8 +73,8 @@ bool istSymPosDefinit(Sparse_Matrix &A){
     //how to determind if a matrix is sysposdefinit?
     size_t n=A.getCols();
     //determine if it's symmetrisch
-    for(size_t row=1;row<=n;row++){
-        for(size_t col=row+1;col<=n;col++){
+    for(size_t row=0;row<=n-1;row++){
+        for(size_t col=row+1;col<=n-1;col++){
             if(A.get(row,col)!=A.get(col,row)){
                 return false;
             }
