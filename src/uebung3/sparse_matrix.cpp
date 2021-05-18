@@ -43,11 +43,13 @@ Sparse_Matrix::Sparse_Matrix(const Sparse_Matrix &M) {
 
 void Sparse_Matrix::put(size_t i, size_t j, double x) {
     coord_t ind(i, j);
+
     if (x != 0) {
         mat[ind] = x;
     } else {
         mat.erase(ind);
     }
+
 }
 
 // ----- Lesezugriff auf Elemente einer const Matrix -----
@@ -67,17 +69,7 @@ double Sparse_Matrix::operator()(size_t i, size_t j) const {
 }
 
 double Sparse_Matrix::get(size_t i, size_t j) const {
-#ifndef NDEBUG
-    if (i >= rows || j >= cols) {
-        matError("Ungueltige Indizes!");
-    }
-#endif
-    coord_t ind(i, j);
-    if (mat.find(ind) == mat.end()) {
-        return 0;
-    } else {
-        return mat.at(ind);
-    }
+    return (*this)(i,j);
 }
 
 
@@ -103,18 +95,20 @@ Sparse_Matrix &Sparse_Matrix::operator+=(const Sparse_Matrix &M) {
 
 #ifndef NDEBUG
     if (M.getRows() != rows || M.getCols() != cols) {
-        matError("Addition nur zwischen Matrizen mit gleicher Anzahl an Zeilen und Spalten moeglich!");
+        matError("Addition nur zwischen Matrizen mit gleicher Zeilen- und Splatenzahl moeglich!");
     }
 #endif
     double sum;
     
     for (std::pair<coord_t, double> entry : M.mat) {
         sum = (*this)(entry.first.first, entry.first.second) + M.mat.at(entry.first);
+        
         if (sum == 0) {
             mat.erase(entry.first);
         } else {
             mat[entry.first] = sum;
         }
+
     }
 
     return *this;
@@ -133,11 +127,13 @@ Sparse_Matrix &Sparse_Matrix::operator-=(const Sparse_Matrix &M) {
     
     for (std::pair<coord_t, double> entry : M.mat) {
         dif = (*this)(entry.first.first, entry.first.second) - M.mat.at(entry.first);
+        
         if (dif == 0) {
             mat.erase(entry.first);
         } else {
             mat[entry.first] = dif;
         }
+
     }
 
     return *this;
@@ -202,6 +198,10 @@ Sparse_Matrix &Sparse_Matrix::operator/=(double c) {
     return *this;
 }
 
+// ==================================
+//        Redimensionierung
+// ==================================
+
 // ----- Redimensionierung ----
 
 Sparse_Matrix &Sparse_Matrix::redim(size_t r, size_t c) {
@@ -225,21 +225,6 @@ Sparse_Matrix operator+(const Sparse_Matrix &A, const Sparse_Matrix &B) {
     return C;
 }
 
-/*Sparse_Matrix operator+(const Sparse_Matrix &A, const Sparse_Matrix &B) {
-#ifndef NDEBUG
-    if (A.getRows() != B.getRows() || A.getCols() != B.getCols()) {
-        matError("Addition nur zwischen Matrizen mit gleicher Anzahl an Zeilen und Spalten moeglich!");
-    }
-#endif
-    double sum;
-    
-    for (std::pair<coord_t, double> entry : B.mat) {
-        sum = A(entry.first.first, entry.first.second) + B.mat[entry.first];
-        A.put(entry.first.first, entry.first.second, sum);
-    }
-
-    return A;
-}*/
 
 // ----- Subtraktion "-" -----
 
@@ -249,22 +234,6 @@ Sparse_Matrix operator-(const Sparse_Matrix &A, const Sparse_Matrix &B) {
     return C;
 }
 
-
-/*Sparse_Matrix operator-(const Sparse_Matrix &A, const Sparse_Matrix &B) {
-#ifndef NDEBUG
-    if (A.getRows() != B.getRows() || A.getCols() != B.getCols()) {
-        matError("Subtraktion nur zwischen Matrizen mit gleicher Anzahl an Zeilen und Spalten moeglich!");
-    }
-#endif
-    double dif;
-    
-    for (std::pair<coord_t, double> entry : B.mat) {
-        dif = A(entry.first.first, entry.first.second) - B.mat[entry.first];
-        A.put(entry.first.first, entry.first.second, dif);
-    }
-
-    return A;
-}*/
 
 // ----- Vorzeichen wechseln "-" ----
 
@@ -290,7 +259,7 @@ Sparse_Matrix operator*(const Sparse_Matrix &A, double c){
     return C;
 }
 
-// ----- Division Vector/Skalar "/" -----
+// ----- Division Matrix/Skalar "/" -----
 
 Sparse_Matrix operator/(const Sparse_Matrix& A, double c) {
     Sparse_Matrix C(A);
@@ -385,15 +354,15 @@ std::ostream& operator<<(std::ostream &s, const Sparse_Matrix &A) {
         s << "\n";
     }
 
-    return s;
+    return s << std::endl;
 }
 
 // ----- Eingabe ">>" -----
 
 std::istream& operator>>(std::istream &s, Sparse_Matrix &A) {
     double value;
-    
     std::cout << std::setiosflags(std::ios::right);
+
     for (size_t i = 0; i < A.getRows(); i++) {
         for (size_t j = 0; j < A.getCols(); j++) {
             std::cout << "\n(" << i << "," << j << ")  ";
@@ -415,21 +384,3 @@ void Sparse_Matrix::matError(const char str[]) {
     std::cerr << "\nMatrixfehler: " << str << '\n' << std::endl;
     std::abort();
 }
-
-/* int main() {
-    Sparse_Matrix A(3,3);
-    Sparse_Matrix B(3,3);
-    Sparse_Matrix C;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            A.put(i, j, i+j);
-            B.put(i, j, i-j);
-        }
-    }
-
-    std::cout << A << std::endl;
-    std::cout << B << std::endl;
-    C = A + B;
-    std::cout << C << std::endl;
-    return 0;
-} */
