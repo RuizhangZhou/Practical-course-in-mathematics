@@ -249,6 +249,13 @@ Vector operator/(const Vector &x, double c) {
 
 Vector operator/(const Vector &x, const Vector &d) {
     // ***** Hier fehlt was *****
+    // erste Zeile von Seite 6
+    //as D is a Diagonalmatrix so we can devide every element of x by every element on the diagonal
+    auto vec = make_unique<Vector>(x.vec->size());
+    for (size_t i = 0; i < x.vec->size(); i++) {
+        (*vec)(i) = x(i) / d(i);
+    }
+    return *vec;
 }
 
 // ----- Vector*.Vector "%"  <--> komponentenweise Multiplikation -----

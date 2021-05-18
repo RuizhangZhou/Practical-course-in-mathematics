@@ -24,7 +24,7 @@ test.out: test.o vector.o sparse_matrix.o
 test.o: test.cpp vector.o sparse_matrix.o
 	$(CXX) $(CXXFLAGS) -c $<
 
-main.out: main.o vector.o sparse_matrix.o
+main.out: main.o vector.o sparse_matrix.o unit.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 main.o: main.cpp vector.o sparse_matrix.o
