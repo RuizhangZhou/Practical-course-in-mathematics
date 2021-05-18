@@ -13,7 +13,7 @@ run_test_mv: test_mv.out
 
 test_mv: test_mv.out
 
-main.out: main.o vector.o sparse_matrix.o
+main.out: main.o vector.o sparse_matrix.o unit.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 main.o: main.cpp vector.o sparse_matrix.o
