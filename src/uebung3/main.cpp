@@ -96,14 +96,14 @@ int cg(const Sparse_Matrix &A,const Vector &b, Vector &x0, const int k_max, doub
     if(A.getCols()<1||A.getCols()!=A.getRows()||A.getCols()!=b.getLength()||A.getCols()!=x0.getLength()){
         return -1;
     }
-    
-    Vector rk=b-A*x0;
-    Vector dk=rk;
+    size_t n=b.getLength();
+    Vector rk=Vector(b-A*x0);
+    Vector dk=Vector(rk);
     int iterCount=0;
-    Vector xk=x0;
+    Vector xk=Vector(x0);
 
     double rknorm2=rk.norm2();
-    Vector Adk;
+    Vector Adk=Vector(n);
     while(true){
         if(iterCount>k_max){
             return 0;
@@ -141,6 +141,7 @@ int main() {
     int k_max;
     for(int id=1;id<=num_examples;id++){
         getExample(id,A,x0,b,eps,k_max); 
+        
         if(istStrengDiagonalDominant(A)){
             int res=gsv(A,b,x0,k_max,eps);
             if(res==0){
@@ -148,8 +149,12 @@ int main() {
             }else if(res==-1){
                 cout<<"gsv:Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
             }
+        }else{
+            cout<<"Beispiel "<<id<<" ist nicht strengdiagonal dominant, also kann nicht mit GSV Verfahren benutzen."<<endl;
         }
 
+
+        getExample(id,A,x0,b,eps,k_max); 
         if(istSymPosDefinit(A)){
             int res=cg(A,b, x0, k_max, eps);
             if(res==0){
@@ -157,10 +162,12 @@ int main() {
             }else if(res==-1){
                 cout<<"CG:Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
             }
+        }else{
+            cout<<"Beispiel "<<id<<" ist nicht symmetrisch positiv definit, also kann nicht mit CG Verfahren benutzen."<<endl;
         }
 
     }
-
+    
 
     return 0;
 }
