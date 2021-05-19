@@ -28,6 +28,11 @@ int gsv(Sparse_Matrix &A,const Vector &b,Vector &x0,const int &k_max,double &eps
         return -1;
     }
 
+    if(!istStrengDiagonalDominant(A)){
+        cout<<"A ist nicht streng diagonal dominant, also wir können die GSV nicht benutzen."<<endl;
+        return -2;
+    }
+
     size_t n=A.getCols();
     Vector d= Vector(n);//use a vector to record all the elements of diagonal
     Sparse_Matrix originalA=Sparse_Matrix(A);//Kopierkonstuktor
@@ -69,7 +74,7 @@ int gsv(Sparse_Matrix &A,const Vector &b,Vector &x0,const int &k_max,double &eps
     //namely x0 from getExample isn't already the answer 
 }
 
-bool istSymPosDefinit(Sparse_Matrix &A){
+bool istSymmretrisch(Sparse_Matrix A){
     //how to determind if a matrix is sysposdefinit?
     size_t n=A.getCols();
     //determine if it's symmetrisch
@@ -81,14 +86,6 @@ bool istSymPosDefinit(Sparse_Matrix &A){
         }
     }
 
-    //determine if it's positiv symmetrisch
-    
-
-
-
-
-
-
     return true;
 }
 
@@ -96,6 +93,12 @@ int cg(const Sparse_Matrix &A,const Vector &b, Vector &x0, const int k_max, doub
     if(A.getCols()<1||A.getCols()!=A.getRows()||A.getCols()!=b.getLength()||A.getCols()!=x0.getLength()){
         return -1;
     }
+
+    if(!istSymmretrisch(A)){
+        cout<<"A ist nicht symmetrisch, also wir können die CG nicht benutzen."<<endl;
+        return -2;
+    }
+
     size_t n=b.getLength();
     Vector rk=Vector(b-A*x0);
     Vector dk=Vector(rk);
@@ -141,29 +144,19 @@ int main() {
     int k_max;
     for(int id=1;id<=num_examples;id++){
         getExample(id,A,x0,b,eps,k_max); 
-        
-        if(istStrengDiagonalDominant(A)){
-            int res=gsv(A,b,x0,k_max,eps);
-            if(res==0){
-                cout<<"gsv:"<<k_max<<" Iterationen erreicht"<<endl;
-            }else if(res==-1){
-                cout<<"gsv:Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
-            }
-        }else{
-            cout<<"Beispiel "<<id<<" ist nicht strengdiagonal dominant, also kann nicht mit GSV Verfahren benutzen."<<endl;
+        int res=gsv(A,b,x0,k_max,eps);
+        if(res==0){
+            cout<<"gsv:"<<k_max<<" Iterationen erreicht"<<endl;
+        }else if(res==-1){
+            cout<<"gsv:Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
         }
 
-
         getExample(id,A,x0,b,eps,k_max); 
-        if(istSymPosDefinit(A)){
-            int res=cg(A,b, x0, k_max, eps);
-            if(res==0){
-                cout<<"CG:"<<k_max<<" Iterationen erreicht"<<endl;
-            }else if(res==-1){
-                cout<<"CG:Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
-            }
-        }else{
-            cout<<"Beispiel "<<id<<" ist nicht symmetrisch positiv definit, also kann nicht mit CG Verfahren benutzen."<<endl;
+        res=cg(A,b, x0, k_max, eps);
+        if(res==0){
+            cout<<"CG:"<<k_max<<" Iterationen erreicht"<<endl;
+        }else if(res==-1){
+            cout<<"CG:Dimensionen von A,b und x0 passen nicht zusammen"<<endl;
         }
 
     }
