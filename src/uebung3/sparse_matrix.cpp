@@ -143,27 +143,7 @@ Sparse_Matrix &Sparse_Matrix::operator-=(const Sparse_Matrix &M) {
 
 Sparse_Matrix &Sparse_Matrix::operator*=(const Sparse_Matrix &M) {
 
-#ifndef NDEBUG
-    if (cols != M.getRows()) {
-        matError("Für die Matrixmultiplikation muss die Spaltenzahl der ersten Matrix mit der Zeilenzahl der zweiten Matrix übereinstimmen!");
-    }
-#endif
-    
-    Sparse_Matrix P(rows, M.getCols());
-    double scalarpro;
-    
-    for (size_t i = 0; i < rows; i++) {
-        for (size_t j = 0; j < M.getCols(); i++) {
-            scalarpro = 0;
-            for (size_t k = 0; k < cols; k++) {
-                scalarpro += (*this)(i,k) + M(k,j);
-            }
-            P.put(i,j,scalarpro);
-        }
-    }
-
-    *this = P;
-
+    // implementation not necessary
     return *this;
 }
 
@@ -277,14 +257,9 @@ Vector operator*(const Sparse_Matrix& A, const Vector& v) {
 #endif
     
     Vector w(A.getRows());
-    double scalarpro = 0;
     
-    for (size_t i = 0; i < A.getRows(); i++) {
-        scalarpro = 0;
-        for (size_t j = 0; j < A.getCols(); j++) {
-            scalarpro += A(i,j) * v(j); 
-        }
-        w(i) = scalarpro;
+    for (std::pair<coord_t, double> entry : A.mat) {
+        w(entry.first.first) += entry.second * v(entry.first.second);
     }
 
     return w;
@@ -300,14 +275,9 @@ Vector operator*(const Vector& v, const Sparse_Matrix& A) {
 #endif
     
     Vector w(A.getCols());
-    double scalarpro = 0;
-    
-    for (size_t j = 0; j < A.getCols(); j++) {
-        scalarpro = 0;
-        for (size_t i = 0; i < A.getRows(); i++) {
-            scalarpro += v(i) * A(i,j); 
-        }
-        w(j) = scalarpro;
+
+    for (std::pair<coord_t, double> entry : A.mat) {
+        w(entry.first.second) += entry.second * v(entry.first.first);
     }
 
     return w;
@@ -320,15 +290,14 @@ Vector operator*(const Vector& v, const Sparse_Matrix& A) {
 // ----- Test auf Gleichheit "==" -----
 
 bool operator==(const Sparse_Matrix &A, const Sparse_Matrix &B) {
-    if (A.getRows() != B.getRows() || A.getCols() != B.getCols()) {
+    if (A.getRows() != B.getRows() || A.getCols() != B.getCols() || A.mat.size() != B.mat.size()) {
         return false;
     }
 
-    for (size_t i = 0; i < A.getRows(); i++) {
-        for (size_t j = 0; j < A.getCols(); j++) {
-            if (A(i,j) != B(i,j)) return false;
-        }
+    for (std::pair<coord_t, double> entry : A.mat) {
+        if (entry.second != B(entry.first.first, entry.first.second)) return false;
     }
+    
 
     return true;
 }
