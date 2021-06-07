@@ -22,8 +22,41 @@ void GreyScale :: resize( int height, int width){
     this->width=width;
 }
 
+// Zuweisung
+GreyScale& GreyScale::operator =  (const GreyScale &x){
+
+}  
+
+// Zuweisungen mit arithm. Operation
+GreyScale& GreyScale::operator += (const GreyScale &x){
+
+}   
+
+GreyScale& GreyScale::operator -= (const GreyScale &x){
+
+}
 
 
+
+GreyScale &GreyScale::binarize(float c){
+
+}
+
+GreyScale &GreyScale::clamp(){
+
+}
+
+GreyScale &GreyScale::contrast(){
+
+}
+
+GreyScale &GreyScale::linTrans(){
+
+}
+
+GreyScale &GreyScale::invert(){
+
+}
 
 
 
