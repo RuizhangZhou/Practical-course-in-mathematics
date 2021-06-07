@@ -8,20 +8,23 @@ class GreyScale{
         int height;
         int width;
 
-        //sparse_matrix Pixels; ?
+        //sparse_matrix pixels; ?
     public:
         GreyScale();
         GreyScale(int height, int width);
         void resize(int height, int width);
-        int getWidth(){
-            return width;
-        }
         int getHeight(){
             return height;
         }
+        int getWidth(){
+            return width;
+        }
+        
 
-        double& operator () (int,int);         // Standard Zugriff auf GrayScaleelement
-        double  operator () (int,int) const;   // Zugriff auf const GrayScale
+        void put(int i, int j, int x);   // Matrixelement schreiben
+        int  get(int i, int j) const;
+        int& operator () (int,int);         // Standard Zugriff auf GrayScaleelement
+        int  operator () (int,int) const;   // Zugriff auf const GrayScale
 
         GreyScale& operator =  (const GreyScale&);   // Zuweisung
         GreyScale& operator += (const GreyScale&);   // Zuweisungen mit arithm. Operation
@@ -30,7 +33,7 @@ class GreyScale{
         GreyScale &binarize(float c);
         GreyScale &clamp();
         GreyScale &contrast();
-        GreyScale &linTrans();
+        GreyScale &linTrans(float a, float b);
         GreyScale &invert();
 
 

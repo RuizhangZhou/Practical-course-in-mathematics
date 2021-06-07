@@ -22,6 +22,24 @@ void GreyScale :: resize( int height, int width){
     this->width=width;
 }
 
+
+
+
+void  GreyScale::put(int i, int j, int x){
+    pixels.put(i,j,x);
+}
+
+int  GreyScale::get(int i, int j) const{
+    return pixels.get(i,j);
+}
+
+int& GreyScale::operator () (int i,int j){
+
+}
+
+int GreyScale::operator () (int i,int j) const{
+
+}
 // Zuweisung
 GreyScale& GreyScale::operator =  (const GreyScale &x){
 
@@ -39,23 +57,64 @@ GreyScale& GreyScale::operator -= (const GreyScale &x){
 
 
 GreyScale &GreyScale::binarize(float c){
+    GreyScale resPic(getHeight(),getWidth());
 
+    for(int i=0;i<getHeight();i++){
+        for(int j=0;j<getWidth();j++){
+            if(get(i,j)<c){
+                resPic.put(i,j,0);
+            }else{
+                resPic.put(i,j,1);
+            }
+        }
+    }
+    return resPic;
 }
 
 GreyScale &GreyScale::clamp(){
+    GreyScale resPic(getHeight(),getWidth());
 
+    for(int i=0;i<getHeight();i++){
+        for(int j=0;j<getWidth();j++){
+            if(get(i,j)<0){
+                resPic.put(i,j,0);
+            }else if(get(i,j)>1){
+                resPic.put(i,j,1);
+            }
+        }
+    }
+    return resPic;
 }
 
 GreyScale &GreyScale::contrast(){
-
+    int length=getHeight()*getWidth();
+    int values[length];
+    for(int i =0;i<getHeight();i++){
+        for(int j=0;j<getWidth();j++){
+            values[i*getWidth()+j]=get(i,j);
+        }
+    }
+    sort(values,length);
+    int min=values[0];
+    int max=values[length-1];
+    //a*min+b=0    a*max+b=1
+    float a=1/(max-min);
+    float b=-a*min;
+    return linTrans(a,b);
 }
 
-GreyScale &GreyScale::linTrans(){
-
+GreyScale &GreyScale::linTrans(float a , float b){
+    GreyScale resPic(getHeight(),getWidth());
+    for(int i =0;i<getHeight();i++){
+        for(int j=0;j<getWidth();j++){
+            resPic.put(i,j,a*get(i,j)+b);
+        }
+    }
+    return resPic;
 }
 
 GreyScale &GreyScale::invert(){
-
+    return linTrans(-1,1);
 }
 
 
