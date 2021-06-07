@@ -1,10 +1,34 @@
 #include <math.h>
 #include <iostream>
 
+#include "grayscale.h"
 using namespace std;
 
+
+
+
+GreyScale::GreyScale(){
+    height=0;
+    width=0;
+}
+
+GreyScale::GreyScale(int height, int width){
+    this->height=height;
+    this->width=width;
+}
+
+void GreyScale :: resize( int height, int width){
+    this->height=height;
+    this->width=width;
+}
+
+
+
+
+
+
 GreyScale &GreyScale::convolve(const float mask[], int size=3) {
-    if (sqrt(sizeof(mask))) != size || size % 2 != 1) {
+    if ( sqrt(sizeof(mask)) != size || size % 2 != 1 ) {
         error("Die Anzahl der Einträge der Maske muss der Quadratzahl einer ungeraden Zahl entsprechen.");
     }
     
@@ -32,7 +56,7 @@ GreyScale &GreyScale::convolve(const float mask[], int size=3) {
 GreyScale &GreyScale::blur() {
     float mask[] = {0, 0.2, 0, 0.2, 0.2, 0.2, 0, 0.2, 0};
 
-    GreyScale resPic(getHeight(), getWdith());
+    GreyScale resPic(getHeight(), getWidth());
     resPic = convolve(mask);
 
     return resPic;
