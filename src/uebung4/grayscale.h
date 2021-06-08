@@ -1,6 +1,8 @@
 #ifndef _GRAYSCALE_H
 #define _SPARSE_MATRIX_H
 
+//#include "sparse_matrix.h"?
+
 using namespace std;
 
 class GreyScale{

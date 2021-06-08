@@ -1,5 +1,6 @@
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 
 #include "grayscale.h"
 using namespace std;
@@ -20,6 +21,7 @@ GreyScale::GreyScale(int height, int width){
 void GreyScale :: resize( int height, int width){
     this->height=height;
     this->width=width;
+    pixels.redim(height,width);
 }
 
 
@@ -94,7 +96,7 @@ GreyScale &GreyScale::contrast(){
             values[i*getWidth()+j]=get(i,j);
         }
     }
-    sort(values,length);
+    sort(values,values+length);//using the sort() function from <algorithm>
     int min=values[0];
     int max=values[length-1];
     //a*min+b=0    a*max+b=1
