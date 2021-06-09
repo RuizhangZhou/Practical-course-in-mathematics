@@ -62,6 +62,80 @@ GreyScale &GreyScale::operator-=(const GreyScale &x) {
 
 }
 
+GreyScale& GreyScale::operator>>(ifstream s){//Eingabe
+    string cur;
+    while(s.get()!=' '){//P2
+        cur+=s.get();
+    }
+    s>>ws;
+
+    if(s.peek()=='#'){
+        while(s.get()!=' '){//Kommentarzeile
+            cur+=s.get();
+        }
+        s>>ws;
+    }
+
+    cur="";//height  
+    while(s.get()!=' '){
+        cur+=s.get();
+    }
+    int height=stoi(cur);
+    s>>ws;
+    cur="";//width
+    while(s.get()!=' '){
+        cur+=s.get();
+    }
+    int width=stoi(cur);
+    this->resize(height, width);
+    s>>ws;
+
+    while(s.get()!=' '){//Graystufen:255
+        cur+=s.get();
+    }
+    s>>ws;
+
+    for(int i=0;i<height;i++){//the pixels
+        for(int j=0;j<width;j++){
+            cur="";
+            while(s.get()!=' '){
+                cur+=s.get();
+            }
+            (*this)(i,j)=stoi(cur)/256;
+            s>>ws;
+        }
+    }
+}
+
+GreyScale& GreyScale::operator<<(ofstream s){//Ausgabe
+    s.write("P2\n",3);
+
+    string cur=to_string(getHeight())+" "+to_string(getWidth())+"\n";
+    s.write(cur.data(),cur.length());
+
+    s.write("255\n",4);
+    
+    int count=1;
+    for(int i=0;i<getHeight();i++){
+        for(int j=0;j<getWidth();j++){
+            cur=to_string(trunc((*this)(i,j)*256));
+            if(cur.length()==1){
+                s.write("  ",2);
+            }else if(cur.length()==2){
+                s.write(" ",1);
+            }
+            s.write(cur.data(),cur.length());
+            s.write(" ",1);
+
+            if(count==16){//every row 16 numbers
+                s.write("\n",1);
+                count=0;
+            }
+            count++;
+        }
+    }
+}
+
 
 GreyScale &GreyScale::binarize(float c) {
     GreyScale resPic(getHeight(), getWidth());

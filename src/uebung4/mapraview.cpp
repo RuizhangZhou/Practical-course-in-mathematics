@@ -14,6 +14,8 @@
 #include "greyscale.h"
 #include "unit.h"
 
+//using namespace std;
+
 // globale Konstanten, die die Darstellung des Bildes kontrollieren
 
 int zoomFac = 1;   // Vergroesserungsfaktor
@@ -254,6 +256,38 @@ int main() {
         if (std::cin.eof()) c = 'q';
 
     } while (c != 'q');  // Quit
+
+
+    //1.
+    GreyScale gs;
+    ifstream  ifs;
+    ifs.open("mapra.pgm", ios::in );
+    ifs >> gs;
+    ifs.close();
+
+    ofstream ofs;
+    ofs.open("result01.pgm",ios::out);
+    ofs << gs;
+    ifs.close();
+    
+    //2.
+    GreyScale gs;
+    ifstream  ifs;
+    ifs.open("puppenbrunnen.pgm", ios::in );
+    ifs >> gs;
+    ifs.close();
+
+    ofstream ofs;
+    ofs.open("result02.pgm",ios::out);
+    ofs << gs;
+    ifs.close();
+
+
+
+
+
+
+
 
     return 0;
 }

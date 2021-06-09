@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <fstream>
 
 using namespace std;
 
@@ -34,6 +35,11 @@ public:
     GreyScale &operator=(const GreyScale &);   // Zuweisung
     GreyScale &operator+=(const GreyScale &);   // Zuweisungen mit arithm. Operation
     GreyScale &operator-=(const GreyScale &);
+
+
+    GreyScale &operator>>(ifstream);
+    GreyScale &operator<<(ofstream);
+
 
     GreyScale &binarize(float c);
 
