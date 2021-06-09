@@ -90,13 +90,13 @@ GreyScale &GreyScale::operator-=(const GreyScale &x) {
 
 std::istream &operator>>(istream &s, GreyScale &pic) {
     string cur;
-    while(s.get()!=' '){//P2
+    while(s.get()!='\n'){//P2
         cur+=s.get();
     }
     s>>ws;
 
     if(s.peek()=='#'){//Kommentarzeile
-        while(s.get()!=' '){
+        while(s.get()!='\n'){
             cur+=s.get();
         }
         s>>ws;
@@ -116,7 +116,7 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     pic.resize(height, width);
     s>>ws;
 
-    while(s.get()!=' '){//Graystufen:255
+    while(s.get()!='\n'){//Graystufe:255
         cur+=s.get();
     }
     s>>ws;
@@ -124,11 +124,15 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     for(int i=0;i<height;i++){//the pixels
         for(int j=0;j<width;j++){
             cur="";
-            while(s.get()!=' '){
-                cur+=s.get();
+            s>>ws;
+            if(!s.eof()){
+                while(s.peek()!=' '&&s.peek()!='\n'){
+                    cur+=s.get();
+                }
+            }else{
+                return;
             }
             pic(i,j)=stoi(cur)/256;
-            s>>ws;
         }
     }
 }
@@ -141,6 +145,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
 
     s.write("255\n",4);
     
+    s.write(" ",1);//the space at the front of first line
     int count=1;
     for(int i=0;i<pic.getHeight();i++){
         for(int j=0;j<pic.getWidth();j++){
@@ -155,6 +160,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
 
             if(count==16){//every row 16 numbers
                 s.write("\n",1);
+                s.write(" ",1);//the space at the front of each line
                 count=0;
             }
             count++;
