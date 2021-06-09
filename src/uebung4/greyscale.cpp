@@ -132,7 +132,7 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
             }else{
                 return;
             }
-            pic(i,j)=stoi(cur)/256;
+            pic(i,j)=stoi(cur)/255;
         }
     }
 }
@@ -149,7 +149,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
     int count=1;
     for(int i=0;i<pic.getHeight();i++){
         for(int j=0;j<pic.getWidth();j++){
-            cur=to_string(trunc(pic(i,j)*256));
+            cur=to_string(trunc(pic(i,j)*255));
             if(cur.length()==1){//0-9, add two space before number
                 s.write("  ",2);
             }else if(cur.length()==2){//10-99, add one space before number
