@@ -50,27 +50,53 @@ GreyScale::GreyScale(const GreyScale &x) {
 
 // Zuweisung
 GreyScale &GreyScale::operator=(const GreyScale &x) {
-
+    if (x.getWidth() == 0) {
+        matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
+    } else {
+        matrix = make_unique<vector<vector<float>>>(x.getHeight(), vector<float>(x.getWidth()));
+        for (int i = 0; i < getHeight(); i++) {
+            for (int j = 0; j < getWidth(); j++) {
+                (*this)(i, j) = x(i, j);
+            }
+        }
+    }
+    return *this;
 }
 
 // Zuweisungen mit arithm. Operation
 GreyScale &GreyScale::operator+=(const GreyScale &x) {
-
+    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()){
+        error("Width or height does not equal.");
+    }
+    for (int i = 0; i < getHeight(); i++) {
+        for (int j = 0; j < getWidth(); j++) {
+            (*this)(i, j) += x(i, j);
+        }
+    }
+    return *this;
 }
 
 GreyScale &GreyScale::operator-=(const GreyScale &x) {
-
+    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()){
+        error("Width or height does not equal.");
+    }
+    for (int i = 0; i < getHeight(); i++) {
+        for (int j = 0; j < getWidth(); j++) {
+            (*this)(i, j) -= x(i, j);
+        }
+    }
+    return *this;
 }
 
-GreyScale& GreyScale::operator>>(ifstream s){//Eingabe
+std::istream &operator>>(istream &s, GreyScale &pic) {
     string cur;
     while(s.get()!=' '){//P2
         cur+=s.get();
     }
     s>>ws;
 
-    if(s.peek()=='#'){
-        while(s.get()!=' '){//Kommentarzeile
+    if(s.peek()=='#'){//Kommentarzeile
+        while(s.get()!=' '){
             cur+=s.get();
         }
         s>>ws;
@@ -87,7 +113,7 @@ GreyScale& GreyScale::operator>>(ifstream s){//Eingabe
         cur+=s.get();
     }
     int width=stoi(cur);
-    this->resize(height, width);
+    pic.resize(height, width);
     s>>ws;
 
     while(s.get()!=' '){//Graystufen:255
@@ -101,27 +127,27 @@ GreyScale& GreyScale::operator>>(ifstream s){//Eingabe
             while(s.get()!=' '){
                 cur+=s.get();
             }
-            (*this)(i,j)=stoi(cur)/256;
+            pic(i,j)=stoi(cur)/256;
             s>>ws;
         }
     }
 }
 
-GreyScale& GreyScale::operator<<(ofstream s){//Ausgabe
+std::ostream &operator<<(ostream &s, const GreyScale &pic) {
     s.write("P2\n",3);
 
-    string cur=to_string(getHeight())+" "+to_string(getWidth())+"\n";
+    string cur=to_string(pic.getHeight())+" "+to_string(pic.getWidth())+"\n";
     s.write(cur.data(),cur.length());
 
     s.write("255\n",4);
     
     int count=1;
-    for(int i=0;i<getHeight();i++){
-        for(int j=0;j<getWidth();j++){
-            cur=to_string(trunc((*this)(i,j)*256));
-            if(cur.length()==1){
+    for(int i=0;i<pic.getHeight();i++){
+        for(int j=0;j<pic.getWidth();j++){
+            cur=to_string(trunc(pic(i,j)*256));
+            if(cur.length()==1){//0-9, add two space before number
                 s.write("  ",2);
-            }else if(cur.length()==2){
+            }else if(cur.length()==2){//10-99, add one space before number
                 s.write(" ",1);
             }
             s.write(cur.data(),cur.length());
@@ -135,6 +161,7 @@ GreyScale& GreyScale::operator<<(ofstream s){//Ausgabe
         }
     }
 }
+
 
 
 GreyScale &GreyScale::binarize(float c) {
@@ -265,7 +292,7 @@ GreyScale &GreyScale::median() {
                     surr[k + l] = (*this)(i - 1 + k, j - 1 + l);
                 }
             }
-            sort(surr, n);
+            //sort(surr[0], surr[8], [](double a, double b) {return a < b;});
 
             resPic(i, j) = surr[4];
         }

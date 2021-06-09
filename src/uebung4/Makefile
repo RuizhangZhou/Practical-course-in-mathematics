@@ -8,10 +8,10 @@ run: main.out
 
 all: main.out
 
-main.out: main.o greyscale.o unit.o
+main.out: mapraview.o greyscale.o unit.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-main.o: main.cpp greyscale.o
+mapraview.o: mapraview.cpp greyscale.o
 	$(CXX) $(CXXFLAGS) -c $<
 
 greyscale.o: greyscale.cpp greyscale.h
