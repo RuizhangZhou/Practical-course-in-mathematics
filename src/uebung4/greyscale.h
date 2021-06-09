@@ -24,16 +24,15 @@ public:
 
     int getWidth() const;
 
-
-    void put(int i, int j, int x);   // Matrixelement schreiben
-    int get(int i, int j) const;
-
     float &operator()(int, int);         // Standard Zugriff auf GrayScaleelement
     float operator()(int, int) const;   // Zugriff auf const GrayScale
 
     GreyScale &operator=(const GreyScale &);   // Zuweisung
     GreyScale &operator+=(const GreyScale &);   // Zuweisungen mit arithm. Operation
     GreyScale &operator-=(const GreyScale &);
+
+    friend std::istream& operator>>(std::istream&, GreyScale&);        // Eingabe
+    friend std::ostream& operator<<(std::ostream&, const GreyScale&);  // Ausgabe
 
     GreyScale &binarize(float c);
 

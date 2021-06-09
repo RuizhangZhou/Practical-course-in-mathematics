@@ -50,15 +50,49 @@ GreyScale::GreyScale(const GreyScale &x) {
 
 // Zuweisung
 GreyScale &GreyScale::operator=(const GreyScale &x) {
-
+    if (x.getWidth() == 0) {
+        matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
+    } else {
+        matrix = make_unique<vector<vector<float>>>(x.getHeight(), vector<float>(x.getWidth()));
+        for (int i = 0; i < getHeight(); i++) {
+            for (int j = 0; j < getWidth(); j++) {
+                (*this)(i, j) = x(i, j);
+            }
+        }
+    }
+    return *this;
 }
 
 // Zuweisungen mit arithm. Operation
 GreyScale &GreyScale::operator+=(const GreyScale &x) {
-
+    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()){
+        error("Width or height does not equal.");
+    }
+    for (int i = 0; i < getHeight(); i++) {
+        for (int j = 0; j < getWidth(); j++) {
+            (*this)(i, j) += x(i, j);
+        }
+    }
+    return *this;
 }
 
 GreyScale &GreyScale::operator-=(const GreyScale &x) {
+    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()){
+        error("Width or height does not equal.");
+    }
+    for (int i = 0; i < getHeight(); i++) {
+        for (int j = 0; j < getWidth(); j++) {
+            (*this)(i, j) -= x(i, j);
+        }
+    }
+    return *this;
+}
+
+std::istream &operator>>(istream &, GreyScale &) {
+
+}
+
+std::ostream &operator<<(ostream &, const GreyScale &) {
 
 }
 
@@ -191,7 +225,7 @@ GreyScale &GreyScale::median() {
                     surr[k + l] = (*this)(i - 1 + k, j - 1 + l);
                 }
             }
-            sort(surr, n);
+            //sort(surr[0], surr[8], [](double a, double b) {return a < b;});
 
             resPic(i, j) = surr[4];
         }
