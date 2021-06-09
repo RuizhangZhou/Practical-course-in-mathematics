@@ -156,12 +156,14 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
                 s.write(" ",1);
             }
             s.write(cur.data(),cur.length());
-            s.write(" ",1);
+            
 
             if(count==16){//every row 16 numbers
-                s.write("\n",1);
+                s.write("\n",1);//if is the last number of this line directly change line
                 s.write(" ",1);//the space at the front of each line
                 count=0;
+            }else{
+                s.write(" ",1);
             }
             count++;
         }
