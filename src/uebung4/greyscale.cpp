@@ -203,16 +203,33 @@ GreyScale &GreyScale::clamp() {
 }
 
 GreyScale &GreyScale::contrast() {
-    int length = getHeight() * getWidth();
-    int values[length];
+    float min=1;
+    float max=0;
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
-            values[i * getWidth() + j] = (*this)(i, j);
+            float cur=(*this)(i, j);
+            if(cur==0){
+                min=0;
+            }else if(cur==1){
+                max=1;
+            }
+
+            if(min==0&&max==1){
+                break;
+            }
+            
+            if(cur>max){
+                max=cur;
+            }
+            if(cur<min){
+                min=cur;
+            }
+        }
+        if(min==0&&max==1){
+            break;
         }
     }
-    sort(values, values + length);//using the sort() function from <algorithm>
-    int min = values[0];
-    int max = values[length - 1];
+    
     //a*min+b=0    a*max+b=1
     float a = 1 / (max - min);
     float b = -a * min;
