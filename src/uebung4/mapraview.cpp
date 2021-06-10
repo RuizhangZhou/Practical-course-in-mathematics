@@ -10,6 +10,7 @@
 #include <cmath>
 #include <fstream>
 #include <vector>
+#include <iostream>
 
 #include "greyscale.h"
 #include "unit.h"
