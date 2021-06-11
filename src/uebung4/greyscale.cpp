@@ -130,7 +130,7 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
                     cur+=s.get();
                 }
             }else{
-                return;
+                return s;
             }
             pic(i,j)=stoi(cur)/255;
         }
@@ -168,6 +168,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
             count++;
         }
     }
+    return s;
 }
 
 
@@ -307,7 +308,7 @@ GreyScale &GreyScale::laplace() {
 GreyScale &GreyScale::median() {
     GreyScale resPic(getHeight(), getWidth());
     double surr[9] = {0};
-    int n = sizeof(surr) / sizeof(surr[0]);
+    //int n = sizeof(surr) / sizeof(surr[0]);
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
@@ -322,6 +323,7 @@ GreyScale &GreyScale::median() {
             resPic(i, j) = surr[4];
         }
     }
+    return resPic;
 }
 
 GreyScale &GreyScale::sobel() {
@@ -331,7 +333,7 @@ GreyScale &GreyScale::sobel() {
     GreyScale picDX = convolve(DX);
     GreyScale picDY = convolve(DY);
 
-    GreyScale resPic(getHeight(), getWidth());
+    GreyScale resPic(getHeight(), gethWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
