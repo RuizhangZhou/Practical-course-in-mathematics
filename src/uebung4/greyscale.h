@@ -60,7 +60,7 @@ public:
 
     GreyScale &sobel();
 
-    void error(const char str[]);
+    static void error(const char str[]);
 };
 
 
