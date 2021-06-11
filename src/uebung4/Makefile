@@ -3,12 +3,12 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O3
 
 .PHONY: clean
 
-run: main.out
-	./main.out
+run: mapraview.out
+	./mapraview.out
 
-all: main.out
+all: mapraview.out
 
-main.out: mapraview.o greyscale.o unit.o
+mapraview.out: mapraview.o greyscale.o unit.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 mapraview.o: mapraview.cpp greyscale.o
