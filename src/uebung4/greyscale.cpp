@@ -333,7 +333,7 @@ GreyScale &GreyScale::sobel() {
     GreyScale picDX = convolve(DX);
     GreyScale picDY = convolve(DY);
 
-    GreyScale resPic(getHeight(), gethWidth());
+    GreyScale resPic(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
