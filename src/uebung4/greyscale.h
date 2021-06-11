@@ -33,8 +33,8 @@ public:
     GreyScale &operator-=(const GreyScale &);
 
 
-    friend std::istream& operator>>(std::istream&, GreyScale&);        // Eingabe
-    friend std::ostream& operator<<(std::ostream&, const GreyScale&);  // Ausgabe
+    friend std::istream &operator>>(std::istream &, GreyScale &);        // Eingabe
+    friend std::ostream &operator<<(std::ostream &, const GreyScale &);  // Ausgabe
 
 
     GreyScale &binarize(float c);

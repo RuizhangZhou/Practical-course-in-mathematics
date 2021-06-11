@@ -65,7 +65,7 @@ GreyScale &GreyScale::operator=(const GreyScale &x) {
 
 // Zuweisungen mit arithm. Operation
 GreyScale &GreyScale::operator+=(const GreyScale &x) {
-    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()){
+    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()) {
         error("Width or height does not equal.");
     }
     for (int i = 0; i < getHeight(); i++) {
@@ -77,7 +77,7 @@ GreyScale &GreyScale::operator+=(const GreyScale &x) {
 }
 
 GreyScale &GreyScale::operator-=(const GreyScale &x) {
-    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()){
+    if (x.getWidth() != getWidth() or x.getHeight() != getHeight()) {
         error("Width or height does not equal.");
     }
     for (int i = 0; i < getHeight(); i++) {
@@ -90,88 +90,87 @@ GreyScale &GreyScale::operator-=(const GreyScale &x) {
 
 std::istream &operator>>(istream &s, GreyScale &pic) {
     string cur;
-    while(s.get()!='\n'){//P2
-        cur+=s.get();
+    while (s.get() != '\n') {//P2
+        cur += s.get();
     }
-    s>>ws;
+    s >> ws;
 
-    if(s.peek()=='#'){//Kommentarzeile
-        while(s.get()!='\n'){
-            cur+=s.get();
+    if (s.peek() == '#') {//Kommentarzeile
+        while (s.get() != '\n') {
+            cur += s.get();
         }
-        s>>ws;
+        s >> ws;
     }
 
-    cur="";//height  
-    while(s.get()!=' '){
-        cur+=s.get();
+    cur = "";//height
+    while (s.get() != ' ') {
+        cur += s.get();
     }
-    int height=stoi(cur);
-    s>>ws;
-    cur="";//width
-    while(s.get()!=' '){
-        cur+=s.get();
+    int height = stoi(cur);
+    s >> ws;
+    cur = "";//width
+    while (s.get() != ' ') {
+        cur += s.get();
     }
-    int width=stoi(cur);
+    int width = stoi(cur);
     pic.resize(height, width);
-    s>>ws;
+    s >> ws;
 
-    while(s.get()!='\n'){//Graystufe:255
-        cur+=s.get();
+    while (s.get() != '\n') {//Graystufe:255
+        cur += s.get();
     }
-    s>>ws;
+    s >> ws;
 
-    for(int i=0;i<height;i++){//the pixels
-        for(int j=0;j<width;j++){
-            cur="";
-            s>>ws;
-            if(!s.eof()){
-                while(s.peek()!=' '&&s.peek()!='\n'){
-                    cur+=s.get();
+    for (int i = 0; i < height; i++) {//the pixels
+        for (int j = 0; j < width; j++) {
+            cur = "";
+            s >> ws;
+            if (!s.eof()) {
+                while (s.peek() != ' ' && s.peek() != '\n') {
+                    cur += s.get();
                 }
-            }else{
+            } else {
                 return s;
             }
-            pic(i,j)=stoi(cur)/255;
+            pic(i, j) = stoi(cur) / 255;
         }
     }
     return s;
 }
 
 std::ostream &operator<<(ostream &s, const GreyScale &pic) {
-    s.write("P2\n",3);
+    s.write("P2\n", 3);
 
-    string cur=to_string(pic.getHeight())+" "+to_string(pic.getWidth())+"\n";
-    s.write(cur.data(),cur.length());
+    string cur = to_string(pic.getHeight()) + " " + to_string(pic.getWidth()) + "\n";
+    s.write(cur.data(), cur.length());
 
-    s.write("255\n",4);
-    
-    s.write(" ",1);//the space at the front of first line
-    int count=1;
-    for(int i=0;i<pic.getHeight();i++){
-        for(int j=0;j<pic.getWidth();j++){
-            cur=to_string(trunc(pic(i,j)*255));
-            if(cur.length()==1){//0-9, add two space before number
-                s.write("  ",2);
-            }else if(cur.length()==2){//10-99, add one space before number
-                s.write(" ",1);
+    s.write("255\n", 4);
+
+    s.write(" ", 1);//the space at the front of first line
+    int count = 1;
+    for (int i = 0; i < pic.getHeight(); i++) {
+        for (int j = 0; j < pic.getWidth(); j++) {
+            cur = to_string(trunc(pic(i, j) * 255));
+            if (cur.length() == 1) {//0-9, add two space before number
+                s.write("  ", 2);
+            } else if (cur.length() == 2) {//10-99, add one space before number
+                s.write(" ", 1);
             }
-            s.write(cur.data(),cur.length());
-            
+            s.write(cur.data(), cur.length());
 
-            if(count==16){//every row 16 numbers
-                s.write("\n",1);//if is the last number of this line directly change line
-                s.write(" ",1);//the space at the front of each line
-                count=0;
-            }else{
-                s.write(" ",1);
+
+            if (count == 16) {//every row 16 numbers
+                s.write("\n", 1);//if is the last number of this line directly change line
+                s.write(" ", 1);//the space at the front of each line
+                count = 0;
+            } else {
+                s.write(" ", 1);
             }
             count++;
         }
     }
     return s;
 }
-
 
 
 GreyScale &GreyScale::binarize(float c) {
@@ -205,33 +204,33 @@ GreyScale &GreyScale::clamp() {
 }
 
 GreyScale &GreyScale::contrast() {
-    float min=1;
-    float max=0;
+    float min = 1;
+    float max = 0;
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
-            float cur=(*this)(i, j);
-            if(cur==0){
-                min=0;
-            }else if(cur==1){
-                max=1;
+            float cur = (*this)(i, j);
+            if (cur == 0) {
+                min = 0;
+            } else if (cur == 1) {
+                max = 1;
             }
 
-            if(min==0&&max==1){
+            if (min == 0 && max == 1) {
                 break;
             }
-            
-            if(cur>max){
-                max=cur;
+
+            if (cur > max) {
+                max = cur;
             }
-            if(cur<min){
-                min=cur;
+            if (cur < min) {
+                min = cur;
             }
         }
-        if(min==0&&max==1){
+        if (min == 0 && max == 1) {
             break;
         }
     }
-    
+
     //a*min+b=0    a*max+b=1
     float a = 1 / (max - min);
     float b = -a * min;
