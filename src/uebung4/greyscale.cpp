@@ -88,51 +88,54 @@ GreyScale &GreyScale::operator-=(const GreyScale &x) {
     return *this;
 }
 
-std::istream &operator>>(istream &s, GreyScale &pic) {
-    string cur;
-    while (s.get() != '\n') {//P2
-        cur += s.get();
-    }
+inline void remove_comment(istream &s) {
     s >> ws;
-
-    if (s.peek() == '#') {//Kommentarzeile
+    while (s.peek() == '#' || s.peek() == '\n') {
         while (s.get() != '\n') {
-            cur += s.get();
+
         }
         s >> ws;
     }
+}
 
-    cur = "";//height
-    while (s.get() != ' ') {
-        cur += s.get();
+inline int get_number(istream &s) {
+    string cur;
+    while (isdigit(s.peek())) {
+        cur += (char) s.get();
     }
-    int height = stoi(cur);
+    return stoi(cur);
+}
+
+std::istream &operator>>(istream &s, GreyScale &pic) {
+    string cur;
+    while (s.peek() != '\n') {
+        cur += (char) s.get();
+    }
+
+    if (cur != "P2") {
+        GreyScale::error("No PGM image");
+    }
+
+    cout << cur << endl;
+
+    remove_comment(s);
+
+    int height = get_number(s);
     s >> ws;
-    cur = "";//width
-    while (s.get() != ' ') {
-        cur += s.get();
+    if (!isdigit(s.peek())) {
+        GreyScale::error("wrong format");
     }
-    int width = stoi(cur);
+    int width = get_number(s);
     pic.resize(height, width);
-    s >> ws;
 
-    while (s.get() != '\n') {//Graystufe:255
-        cur += s.get();
-    }
-    s >> ws;
+    remove_comment(s);
+    auto max_val = (float) get_number(s);
+    remove_comment(s);
 
-    for (int i = 0; i < height; i++) {//the pixels
-        for (int j = 0; j < width; j++) {
-            cur = "";
-            s >> ws;
-            if (!s.eof()) {
-                while (s.peek() != ' ' && s.peek() != '\n') {
-                    cur += s.get();
-                }
-            } else {
-                return s;
-            }
-            pic(i, j) = stoi(cur) / 255;
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++){
+            remove_comment(s);
+            pic(i, j) = ((float) get_number(s)) / max_val;
         }
     }
     return s;
