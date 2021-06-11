@@ -135,6 +135,7 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
             pic(i,j)=stoi(cur)/255;
         }
     }
+    return s;
 }
 
 std::ostream &operator<<(ostream &s, const GreyScale &pic) {
