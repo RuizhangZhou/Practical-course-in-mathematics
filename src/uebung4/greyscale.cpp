@@ -167,33 +167,33 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
 
 
 GreyScale &GreyScale::binarize(float c) {
-    GreyScale resPic(getHeight(), getWidth());
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
             if ((*this)(i, j) < c) {
-                resPic(i, j) = 0;
+                (*resPicPtr)(i, j) = 0;
             } else {
-                resPic(i, j) = 1;
+                (*resPicPtr)(i, j) = 1;
             }
         }
     }
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::clamp() {
-    GreyScale resPic(getHeight(), getWidth());
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
             if ((*this)(i, j) < 0) {
-                resPic(i, j) = 0;
+                (*resPicPtr)(i, j) = 0;
             } else if ((*this)(i, j) > 1) {
-                resPic(i, j) = 1;
+                (*resPicPtr)(i, j) = 1;
             }
         }
     }
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::contrast() {
@@ -231,13 +231,13 @@ GreyScale &GreyScale::contrast() {
 }
 
 GreyScale &GreyScale::linTrans(float a, float b) {
-    GreyScale resPic(getHeight(), getWidth());
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
-            resPic(i, j) = a * (*this)(i, j) + b;
+            (*resPicPtr)(i, j) = a * (*this)(i, j) + b;
         }
     }
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::invert() {
@@ -246,13 +246,13 @@ GreyScale &GreyScale::invert() {
 
 
 GreyScale &GreyScale::convolve(const float mask[], int size = 3) {
-    if (sqrt(sizeof(mask)) != size || size % 2 != 1) {
+    /*if (sqrt(sizeof(mask)/sizeof(*mask)) != size || size % 2 != 1) {
         error("Die Anzahl der Einträge der Maske muss der Quadratzahl einer ungeraden Zahl entsprechen.");
-    }
+    }*/
 
     int midStaDif = (size - 1) / 2;
 
-    GreyScale resPic(getHeight(), getWidth());
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
@@ -261,47 +261,47 @@ GreyScale &GreyScale::convolve(const float mask[], int size = 3) {
             int widStart = j - midStaDif;
             for (int k = 0; k < size; k++) {
                 for (int l = 0; l < size; l++) {
-                    resPic(i, j) += (*this)(heiStart + k, widStart + l) * mask[k + l];
+                    (*resPicPtr)(i, j) += (*this)(heiStart + k, widStart + l) * mask[k + l];
                 }
             }
 
         }
     }
 
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::blur() {
     float mask[] = {0, 0.2, 0, 0.2, 0.2, 0.2, 0, 0.2, 0};
 
-    GreyScale resPic(getHeight(), getWidth());
-    resPic = convolve(mask);
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
+    *resPicPtr = convolve(mask);
 
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::kirsch() {
     float mask[] = {1, 3, 3, -1, 0, 1, -3, -3, -1};
 
-    GreyScale resPic(getHeight(), getWidth());
-    resPic = convolve(mask);
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
+    *resPicPtr = convolve(mask);
 
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::laplace() {
     float mask[] = {0, -1, 0, -1, 4, -1, 0, -1, 0};
 
-    GreyScale resPic(getHeight(), getWidth());
-    resPic = convolve(mask);
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
+    *resPicPtr = convolve(mask);
 
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::median() {
-    GreyScale resPic(getHeight(), getWidth());
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
     double surr[9] = {0};
-    //int n = sizeof(surr) / sizeof(surr[0]);
+    int n = sizeof(surr) / sizeof(surr[0]);
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
@@ -311,12 +311,12 @@ GreyScale &GreyScale::median() {
                     surr[k + l] = (*this)(i - 1 + k, j - 1 + l);
                 }
             }
-            //sort(surr[0], surr[8], [](double a, double b) {return a < b;});
+            sort(surr, surr + n);
 
-            resPic(i, j) = surr[4];
+            (*resPicPtr)(i, j) = surr[4];
         }
     }
-    return resPic;
+    return *resPicPtr;
 }
 
 GreyScale &GreyScale::sobel() {
@@ -326,15 +326,15 @@ GreyScale &GreyScale::sobel() {
     GreyScale picDX = convolve(DX);
     GreyScale picDY = convolve(DY);
 
-    GreyScale resPic(getHeight(), getWidth());
+    auto resPicPtr = make_unique<GreyScale>(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
-            resPic(i, j) = sqrt(pow(picDX(i, j), 2) + pow(picDY(i, j), 2));
+            (*resPicPtr)(i, j) = sqrt(pow(picDX(i, j), 2) + pow(picDY(i, j), 2));
         }
     }
 
-    return resPic;
+    return (*resPicPtr);
 }
 
 void GreyScale::error(const char str[]) {
