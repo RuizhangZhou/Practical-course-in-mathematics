@@ -11,6 +11,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <cstring>
 
 #include "greyscale.h"
 #include "unit.h"
@@ -34,7 +35,7 @@ void display(const GreyScale &pic, int id, const char text[]) {
 
     for (int j = 0; j < pic.getHeight(); j++)  // Fuer alle Bildpunkte ...
         for (int i = 0; i < pic.getWidth(); i++) {
-            float gr = std::rint(pic(i, j) * 255);  // [0,1] auf [0,255] skalieren
+            float gr = std::rint(pic(j, i) * 255);  // [0,1] auf [0,255] skalieren
             if (gr > 255)
                 gr = 255;
             else if (gr < 0)
@@ -55,9 +56,17 @@ void display(const GreyScale &pic, int id, const char text[]) {
 // interpretiert (z.B. die Filter aus der Greyscale-Klasse aufruft oder die
 // globalen Variablen "show" und "zoomFac" setzt und das Ergebnis anzeigt).
 
-int main() {
+int main(int argc, char* argv[]) {
     GreyScale pic, newpic;
-    char name[200], c = 'h';
+    char name[200];
+    int numArg = 1;
+    char c;
+    if (numArg < argc) {
+        c = argv[numArg][0];
+        numArg++;
+    } else {
+        c = 'h';
+    }
 #ifdef SET_FORMAT
     int frmt;
 #endif
@@ -75,8 +84,13 @@ int main() {
                 break;
 
             case 'r':  // Read
-                std::cout << "Read image... Enter filename: ";
-                std::cin >> name;
+                if (numArg < argc) {
+                    strcpy(name, argv[numArg]);
+                    numArg++;
+                } else {
+                    std::cout << "Read image... Enter filename: ";
+                    std::cin >> name;
+                }
                 {
                     std::ifstream file(name);
                     if (file.rdstate())
@@ -91,8 +105,13 @@ int main() {
                 break;
 
             case 'w':  // Write
-                std::cout << "Write image... Enter filename: ";
-                std::cin >> name;
+                if (numArg < argc) {
+                    strcpy(name, argv[numArg]);
+                    numArg++;
+                } else {
+                    std::cout << "Write image... Enter filename: ";
+                    std::cin >> name;
+                }
                 {
                     std::ofstream file(name);
                     if (file.rdstate())
@@ -252,141 +271,16 @@ int main() {
                 break;
         }
 
-        std::cout << "Enter Command (h for help): ";
-        std::cin >> c;
-        if (std::cin.eof()) c = 'q';
+        if (numArg < argc) {
+            c = argv[numArg][0];
+            numArg++;
+        } else {
+            std::cout << "Enter Command (h for help): ";
+            std::cin >> c;
+            if (std::cin.eof()) c = 'q';
+        }
 
     } while (c != 'q');  // Quit
-
-
-    //1.
-    GreyScale gs;
-    ifstream  ifs;
-    ifs.open("bilder/mapra.pgm", ios::in );
-    ifs >> gs;
-    ifs.close();
-
-    ofstream ofs;
-    ofs.open("bilder/result01.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-    
-    //2.
-    ifs.open("bilder/puppenbrunnen.pgm", ios::in );
-    ifs >> gs;
-    ifs.close();
-
-    ofs.open("bilder/result02.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //3.
-    ifs.open("bilder/dom.pgm", ios::in );
-    ifs >> gs;
-    for(int i =1;i<=5;i++){
-       gs.median();
-    }
-    ifs.close();
-
-    ofs.open("bilder/result03.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //4.
-    ifs.open("bilder/dom.pgm", ios::in );
-    ifs >> gs;
-    for(int i =1;i<=2;i++){
-       gs.blur();
-    }
-    ifs.close();
-
-    ofs.open("bilder/result04.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //5.
-    ifs.open("bilder/shuttle.pgm", ios::in );
-    ifs >> gs;
-    gs.kirsch();
-    gs.contrast();
-    ifs.close();
-
-    ofs.open("bilder/result05.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //6.
-    ifs.open("bilder/shuttle.pgm", ios::in );
-    ifs >> gs;
-    gs.laplace();
-    ifs.close();
-
-    ofs.open("bilder/result06.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //7.
-    ifs.open("bilder/shuttle.pgm", ios::in );
-    ifs >> gs;
-    gs.sobel();
-    ifs.close();
-
-    ofs.open("bilder/result07.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //8.
-    ifs.open("bilder/bauteil.pgm", ios::in );
-    ifs >> gs;
-    gs.contrast();
-    gs.binarize(0.5);//which value should we choose? 0.5?
-    ifs.close();
-
-    ofs.open("bilder/result08.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //9.
-    ifs.open("bilder/bauteil.pgm", ios::in );
-    ifs >> gs;
-    gs.sobel();
-    gs.invert();
-    ifs.close();
-
-    ofs.open("bilder/result09.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //10. what's the meaning of "+" hier?
-    ifs.open("bilder/roentgen.pgm", ios::in );
-    ifs >> gs;
-    for(int i=1;i<=3;i++){
-        gs.sobel();
-    }
-    gs.contrast();
-    ifs.close();
-
-    ofs.open("bilder/result10.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-    //11. Also hier what's the meaning of "+"?
-    ifs.open("bilder/result4.pgm", ios::in );
-    ifs >> gs;
-    for(int i=1;i<5;i++){
-        gs.laplace();
-    }
-    ifs.close();
-
-    ofs.open("bilder/result11.pgm",ios::out);
-    ofs << gs;
-    ofs.close();
-
-
-
-
-
-
 
 
     return 0;
