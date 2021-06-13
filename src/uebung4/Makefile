@@ -31,6 +31,7 @@ run_tests: bildtest results
 	./bildtest -a11 results/result11.pgm
 
 results: mapraview.out
+	mkdir -p results
 	./mapraview.out d r bilder/mapra.pgm w results/result01.pgm q
 	./mapraview.out d r bilder/puppenbrunnen.pgm w results/result02.pgm q
 	./mapraview.out d r bilder/dom.pgm m m m m m w results/result03.pgm q
@@ -44,4 +45,4 @@ results: mapraview.out
 	./mapraview.out d r results/result04.pgm L L L L L w results/result11.pgm q
 
 clean:
-	rm -f mapraview.o mapraview.out greyscale.o results/result*.pgm
+	rm -f mapraview.o mapraview.out greyscale.o results
