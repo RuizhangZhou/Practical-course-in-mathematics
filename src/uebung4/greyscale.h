@@ -11,6 +11,9 @@ class GreyScale {
 private:
 
     unique_ptr<vector<vector<float>>> matrix;
+    /*unique_ptr: 智能指针
+    同时只有一个unique_ptr指向同一个对象,当这个unique_ptr被销毁时，指向的对象也随即被销毁
+    */
 
 public:
     GreyScale();

@@ -8,7 +8,15 @@ using namespace std;
 
 
 GreyScale::GreyScale() {
+    //unique_ptr<vector<vector<float>>> matrix;
     matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
+    /*
+    这里后面的(0, vector<float>(0))其实是vector的一个构造方法：
+    vector(size_type Count,const Type& Val);--创建一个大小为Count的向量，该向量中所有的元素都初始化为Val
+    
+    vector<float>(0)是用了vector的另一个构造方法：
+    vector(size_type Count);--创建一个大小为Count的向量vector
+    */
 }
 
 int GreyScale::getHeight() const {
@@ -30,9 +38,9 @@ void GreyScale::resize(int height, int width) {
 
 float &GreyScale::operator()(int i, int j) {
     if (0 <= i && i < getHeight() && 0 <= j && j < getWidth()) {
-        return (*matrix)[i][j];
+        return (*matrix)[i][j];//vector中可以用[][]来直接调其中的元素
     } else if (0 <= i && i < getHeight()) {
-        if (j < 0) {
+        if (j < 0) {//用边缘的pixel替代超出边缘的pixel
             return (*matrix)[i][0];
         } else {
             return (*matrix)[i][getWidth()-1];
@@ -56,7 +64,7 @@ float &GreyScale::operator()(int i, int j) {
     }
 }
 
-float GreyScale::operator()(int i, int j) const {
+float GreyScale::operator()(int i, int j) const {//这个和上面的有什么区别吗，有什么存在的必要吗？
     if (0 <= i && i < getHeight() && 0 <= j && j < getWidth()) {
         return (*matrix)[i][j];
     } else if (0 <= i && i < getHeight()) {
