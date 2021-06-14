@@ -165,8 +165,6 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
         GreyScale::error("No PGM image");
     }
 
-    //cout << cur << endl;
-
     remove_comment(s);
 
     int width = get_number(s);
