@@ -139,11 +139,17 @@ GreyScale &GreyScale::operator-=(const GreyScale &x) {
 
 inline void remove_comment(istream &s) {
     s >> ws;
-    while (s.peek() == '#' || s.peek() == '\n') {
-        while (s.get() != '\n') {
+    while (s.good() and (s.peek() == '#' or s.peek() == '\n')) {
+        while (s.good() and s.get() != '\n') {
 
         }
         s >> ws;
+    }
+}
+
+inline void check_good(istream &s) {
+    if (not s.good()){
+        GreyScale::error("Input stream error occurred.");
     }
 }
 
@@ -182,13 +188,18 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++){
             remove_comment(s);
+            check_good(s);
             pic(i, j) = ((float) get_number(s)) / max_val;
         }
+    }
+    remove_comment(s);
+    if (not s.eof()) {
+        GreyScale::error("Has not reached end of file.");
     }
     return s;
 }
 
-std::ostream &operator<<(ostream &s, const GreyScale &pic) {    
+std::ostream &operator<<(ostream &s, const GreyScale &pic) {
     s.write("P2\n", 3);
 
     string cur = to_string(pic.getWidth()) + " " + to_string(pic.getHeight()) + "\n";
@@ -343,7 +354,7 @@ GreyScale &GreyScale::median() {
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
-            
+
             for (int k = 0; k < 3; k++) {
                 for (int l = 0; l < 3; l++) {
                     surr[3 * k + l] = (*this)(i - 1 + k, j - 1 + l);
