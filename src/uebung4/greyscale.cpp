@@ -35,23 +35,23 @@ float &GreyScale::operator()(int i, int j) {
         if (j < 0) {
             return (*matrix)[i][0];
         } else {
-            return (*matrix)[i][getWidth()-1];
+            return (*matrix)[i][getWidth() - 1];
         }
     } else if (0 <= j && j < getWidth()) {
         if (i < 0) {
             return (*matrix)[0][j];
         } else {
-            return (*matrix)[getHeight()-1][j];
+            return (*matrix)[getHeight() - 1][j];
         }
     } else {
         if (i < 0 && j < 0) {
             return (*matrix)[0][0];
         } else if (i < 0 && j >= getWidth()) {
-            return (*matrix)[0][getWidth()-1];
+            return (*matrix)[0][getWidth() - 1];
         } else if (i >= getHeight() && j < 0) {
             return (*matrix)[getHeight() - 1][0];
         } else {
-            return  (*matrix)[getHeight() - 1][getWidth()-1];
+            return (*matrix)[getHeight() - 1][getWidth() - 1];
         }
     }
 }
@@ -63,23 +63,23 @@ float GreyScale::operator()(int i, int j) const {
         if (j < 0) {
             return (*matrix)[i][0];
         } else {
-            return (*matrix)[i][getWidth()-1];
+            return (*matrix)[i][getWidth() - 1];
         }
     } else if (0 <= j && j < getWidth()) {
         if (i < 0) {
             return (*matrix)[0][j];
         } else {
-            return (*matrix)[getHeight()-1][j];
+            return (*matrix)[getHeight() - 1][j];
         }
     } else {
         if (i < 0 && j < 0) {
             return (*matrix)[0][0];
         } else if (i < 0 && j >= getWidth()) {
-            return (*matrix)[0][getWidth()-1];
+            return (*matrix)[0][getWidth() - 1];
         } else if (i >= getHeight() && j < 0) {
-            return (*matrix)[getHeight()-1][0];
-        } else{
-            return  (*matrix)[getHeight() - 1][getWidth()-1];
+            return (*matrix)[getHeight() - 1][0];
+        } else {
+            return (*matrix)[getHeight() - 1][getWidth() - 1];
         }
     }
 }
@@ -148,7 +148,7 @@ inline void remove_comment(istream &s) {
 }
 
 inline void check_good(istream &s) {
-    if (not s.good()){
+    if (not s.good()) {
         GreyScale::error("Input stream error occurred.");
     }
 }
@@ -186,7 +186,7 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     remove_comment(s);
 
     for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++){
+        for (int j = 0; j < width; j++) {
             remove_comment(s);
             check_good(s);
             pic(i, j) = ((float) get_number(s)) / max_val;
@@ -231,7 +231,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
 
 
 GreyScale &GreyScale::binarize(float c) {
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
@@ -246,7 +246,7 @@ GreyScale &GreyScale::binarize(float c) {
 }
 
 GreyScale &GreyScale::clamp() {
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
@@ -283,7 +283,7 @@ GreyScale &GreyScale::contrast() {
 }
 
 GreyScale &GreyScale::linTrans(float a, float b) {
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
             (*resPicPtr)(i, j) = a * (*this)(i, j) + b;
@@ -301,7 +301,7 @@ GreyScale &GreyScale::convolve(const float mask[], int size = 3) {
 
     int midStaDif = (size - 1) / 2;
 
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
@@ -322,7 +322,7 @@ GreyScale &GreyScale::convolve(const float mask[], int size = 3) {
 GreyScale &GreyScale::blur() {
     float mask[] = {0, 0.2, 0, 0.2, 0.2, 0.2, 0, 0.2, 0};
 
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
     *resPicPtr = convolve(mask);
 
     return *resPicPtr;
@@ -331,7 +331,7 @@ GreyScale &GreyScale::blur() {
 GreyScale &GreyScale::kirsch() {
     float mask[] = {1, 3, 3, -1, 0, 1, -3, -3, -1};
 
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
     *resPicPtr = convolve(mask);
 
     return *resPicPtr;
@@ -340,14 +340,14 @@ GreyScale &GreyScale::kirsch() {
 GreyScale &GreyScale::laplace() {
     float mask[] = {0, -1, 0, -1, 4, -1, 0, -1, 0};
 
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
     *resPicPtr = convolve(mask);
 
     return *resPicPtr;
 }
 
 GreyScale &GreyScale::median() {
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
     float surr[9] = {0};
     int n = sizeof(surr) / sizeof(surr[0]);
 
@@ -375,7 +375,7 @@ GreyScale &GreyScale::sobel() {
     GreyScale picDX = convolve(DX);
     GreyScale picDY = convolve(DY);
 
-    GreyScale* resPicPtr = new GreyScale(getHeight(), getWidth());
+    GreyScale *resPicPtr = new GreyScale(getHeight(), getWidth());
 
     for (int i = 0; i < getHeight(); i++) {
         for (int j = 0; j < getWidth(); j++) {
