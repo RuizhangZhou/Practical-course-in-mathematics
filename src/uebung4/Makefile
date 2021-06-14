@@ -45,4 +45,4 @@ results: mapraview.out
 	./mapraview.out d r results/result04.pgm L L L L L w results/result11.pgm q
 
 clean:
-	rm -f mapraview.o mapraview.out greyscale.o results
+	rm -r -f mapraview.o mapraview.out greyscale.o results
