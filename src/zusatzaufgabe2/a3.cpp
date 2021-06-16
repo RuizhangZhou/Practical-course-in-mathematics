@@ -21,7 +21,7 @@ lint trialDivision(lint n, const Sieve &sieve) {
 // Fermat
 
 lint fermatTest(lint n, lint a) {
-    return 0;
+    return fastpow(a,n-1,n);
 }
 
 // Miller-Rabin
@@ -70,6 +70,27 @@ int main() {
     // PrimTest
 
     // Fermat-Test
+    for(int i=1;i<=num_examples;i++){
+        lint n=getCandidate(FERMAT,i);
+        int y=1;
+        
+        for (lint a=1;a<maxPrimeNumber;a++){
+            if(!sieve[a]||n%a==0) continue;
+            y=fermatTest(n,a);
+            checkSolution(FERMAT,i,y,a);
+            if(y!=1){
+                break;
+            }
+        }
+
+        if(y==1){
+            checkSolution(FERMAT,i,1,0);
+        }else{
+            checkSolution(FERMAT,i,0,0);
+        }
+    }
+
+
 
     // Miller-Rabin-Test
 
