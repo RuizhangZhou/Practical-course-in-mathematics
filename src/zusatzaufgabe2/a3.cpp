@@ -62,7 +62,7 @@ void getDS(lint n, lint &d, lint &s) {
 
 lint trialDivision(lint n, const Sieve &sieve) {
     for (lint i = 2; i < (lint) sqrt((double) n) + 1; i++) {
-        if (sieve[i] and n % i == 0) {
+        if (sieve[i] && n % i == 0) {
             return i;
         }
     }
@@ -94,6 +94,7 @@ int main() {
     sieve[1] = false;
 
     for (lint i = 2; i < (lint) sqrt((double) Sieve::length()) + 1; i++) {
+        if(!sieve[i]) continue;
         for (lint j = 2 * i; j < Sieve::length(); j += i) {
             sieve[j] = false;
         }
