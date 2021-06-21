@@ -12,7 +12,7 @@ using namespace std;
 
 // Hilfsfunktionen
 
-void detBinaryRepresentation(lint nExp, vector<int>& x) {
+void detBinaryRepresentation(lint nExp, vector<int> &x) {
     if (nExp == 0) {
         x.push_back(0);
     } else {
@@ -44,16 +44,16 @@ lint fastpow(lint nBase, lint nExp, lint nMod) {
 
 void getDS(lint n, lint &d, lint &s) {
     lint r = 0;
-    lint twoPowr = (lint) powl(2,r);
-    
+    lint twoPowr = (lint) powl(2, r);
+
     while ((n - 1) % twoPowr == 0) {
         s = r;
         r++;
         twoPowr = twoPowr * 2;
     }
-    
+
     lint twoPows = twoPowr / 2;
-    d = (n-1) / twoPows;
+    d = (n - 1) / twoPows;
 
     return;
 }
@@ -72,7 +72,7 @@ lint trialDivision(lint n, const Sieve &sieve) {
 // Fermat
 
 lint fermatTest(lint n, lint a) {
-    return fastpow(a,n-1,n);
+    return fastpow(a, n - 1, n);
 }
 
 // Miller-Rabin
@@ -87,14 +87,14 @@ lint millerRabinTest(lint n, lint a, lint d, lint r) {
 // Hauptprogramm
 //------------------------------------------------------------------------------
 
-int main() { 
+int main() {
     Sieve sieve;
 
     sieve[0] = false;
     sieve[1] = false;
 
     for (lint i = 2; i < (lint) sqrt((double) Sieve::length()) + 1; i++) {
-        if(!sieve[i]) continue;
+        if (!sieve[i]) continue;
         for (lint j = 2 * i; j < Sieve::length(); j += i) {
             sieve[j] = false;
         }
@@ -103,37 +103,37 @@ int main() {
     checkSieve(sieve);
 
     // PrimTest
-    
+
     for (unsigned int i = 1; i <= num_examples; i++) {
         lint test = getCandidate(DIVISION, i);
         checkSolution(DIVISION, i, trialDivision(test, sieve));
     }
- 
+
 
     // Fermat-Test
 
-    for(int i=1;i<=(int) num_examples;i++){
-        lint n=getCandidate(FERMAT,i);
-        int y=1;
-        
-        for (lint a=1;a<maxPrimeNumber;a++){
-            if(!sieve[a]||n%a==0) continue;
-            y=fermatTest(n,a);
-            checkSolution(FERMAT,i,y,a);
-            if(y!=1){
+    for (int i = 1; i <= (int) num_examples; i++) {
+        lint n = getCandidate(FERMAT, i);
+        int y = 1;
+
+        for (lint a = 1; a < maxPrimeNumber; a++) {
+            if (!sieve[a] || n % a == 0) continue;
+            y = fermatTest(n, a);
+            checkSolution(FERMAT, i, y, a);
+            if (y != 1) {
                 break;
             }
         }
 
-        if(y==1){
-            checkSolution(FERMAT,i,1,0);
-        }else{
-            checkSolution(FERMAT,i,0,0);
+        if (y == 1) {
+            checkSolution(FERMAT, i, 1, 0);
+        } else {
+            checkSolution(FERMAT, i, 0, 0);
         }
     }
 
     // Miller-Rabin-Test
-    
+
     for (int i = 1; i <= (int) num_examples; i++) {
         lint n = getCandidate(MILLER_RABIN, i);
         lint f = 1;
