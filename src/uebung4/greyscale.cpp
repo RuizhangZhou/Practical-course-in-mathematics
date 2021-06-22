@@ -161,18 +161,7 @@ inline int get_number(istream &s) {
     return stoi(cur);
 }
 
-std::istream &operator>>(istream &s, GreyScale &pic) {
-    string cur;
-    while (s.peek() != '\n') {
-        cur += (char) s.get();
-    }
-
-    if (cur != "P2") {
-        GreyScale::error("No PGM image");
-    }
-
-    remove_comment(s);
-
+void leseOperatorP(istream &s, GreyScale &pic,string cur){
     int width = get_number(s);
     s >> ws;
     if (!isdigit(s.peek())) {
@@ -180,11 +169,11 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     }
     int height = get_number(s);
     pic.resize(height, width);
-
     remove_comment(s);
+
     auto max_val = (float) get_number(s);
     remove_comment(s);
-
+    
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             remove_comment(s);
@@ -192,10 +181,51 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
             pic(i, j) = ((float) get_number(s)) / max_val;
         }
     }
+    
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            remove_comment(s);
+            check_good(s);
+            if(cur=="P2"){
+                pic(i, j) = ((float) get_number(s)) / max_val;
+            }else if(cur=="P5"){
+                pic(i,j)=((float) s.get()/max_val);
+            }
+            
+        }
+    }
+    
     remove_comment(s);
     if (not s.eof()) {
         GreyScale::error("Has not reached end of file.");
     }
+}
+
+void leseOperatorMHa(istream &s, GreyScale &pic){
+
+}
+
+void leseOperatorMHb(istream &s, GreyScale &pic){
+
+}
+
+std::istream &operator>>(istream &s, GreyScale &pic) {
+    string cur;
+    while (s.peek() != '\n') {
+        cur += (char) s.get();
+    }
+    remove_comment(s);
+
+    if(cur=="P2"||cur=="P5"){
+        leseOperatorP(s,pic,cur);
+    }else if (cur=="MHa"){
+        leseOperatorMHa(s,pic);
+    }else if (cur=="MHb"){
+        leseOperatorMHb(s,pic);
+    }else{
+        GreyScale::error("No PGM image");
+    }
+
     return s;
 }
 
