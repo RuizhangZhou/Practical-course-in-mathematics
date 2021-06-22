@@ -178,20 +178,11 @@ void leseOperatorP(istream &s, GreyScale &pic,string cur){
         for (int j = 0; j < width; j++) {
             remove_comment(s);
             check_good(s);
-            pic(i, j) = ((float) get_number(s)) / max_val;
-        }
-    }
-    
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            remove_comment(s);
-            check_good(s);
             if(cur=="P2"){
                 pic(i, j) = ((float) get_number(s)) / max_val;
             }else if(cur=="P5"){
                 pic(i,j)=((float) s.get()/max_val);
             }
-            
         }
     }
     
