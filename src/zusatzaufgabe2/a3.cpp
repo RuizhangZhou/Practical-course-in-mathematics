@@ -95,7 +95,7 @@ int main() {
 
     for (lint i = 2; i < (lint) sqrt((double) Sieve::length()) + 1; i++) {
         if (!sieve[i]) continue;
-        for (lint j = 2 * i; j < Sieve::length(); j += i) {
+        for (lint j = i * i; j < Sieve::length(); j += i) {
             sieve[j] = false;
         }
     }
