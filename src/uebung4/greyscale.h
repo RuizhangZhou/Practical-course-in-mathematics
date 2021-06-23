@@ -8,11 +8,21 @@
 using namespace std;
 
 class GreyScale {
+    
 private:
 
     unique_ptr<vector<vector<float>>> matrix;
-
+    
 public:
+    enum formats{//am I right to write the enum declaration here?
+        P2,
+        P5,
+        MHa,
+        MHb
+    };
+
+    static formats format;
+
     GreyScale();
 
     GreyScale(int height, int width);
@@ -61,6 +71,8 @@ public:
     GreyScale &sobel();
 
     static void error(const char str[]);
+
+    static void setFormat(int);
 };
 
 

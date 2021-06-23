@@ -161,7 +161,7 @@ inline int get_number(istream &s) {
     return stoi(cur);
 }
 
-void leseOperatorP(istream &s, GreyScale &pic,string cur){
+void readOperatorPGM(istream &s, GreyScale &pic,string magicNumber){
     int width = get_number(s);
     s >> ws;
     if (!isdigit(s.peek())) {
@@ -178,10 +178,12 @@ void leseOperatorP(istream &s, GreyScale &pic,string cur){
         for (int j = 0; j < width; j++) {
             remove_comment(s);
             check_good(s);
-            if(cur=="P2"){
+            if(magicNumber=="P2"){
                 pic(i, j) = ((float) get_number(s)) / max_val;
-            }else if(cur=="P5"){
+            }else if(magicNumber=="P5"){
                 pic(i,j)=((float) s.get()/max_val);
+                //the return value of get() is int, 
+                //so hier can automatically transfer the char to corresponding ASCII code?
             }
         }
     }
@@ -192,11 +194,11 @@ void leseOperatorP(istream &s, GreyScale &pic,string cur){
     }
 }
 
-void leseOperatorMHa(istream &s, GreyScale &pic){
+void readOperatorMHa(istream &s, GreyScale &pic){
 
 }
 
-void leseOperatorMHb(istream &s, GreyScale &pic){
+void readOperatorMHa(istream &s, GreyScale &pic){
 
 }
 
@@ -208,19 +210,19 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     remove_comment(s);
 
     if(cur=="P2"||cur=="P5"){
-        leseOperatorP(s,pic,cur);
+        readOperatorPGM(s,pic,cur);
     }else if (cur=="MHa"){
-        leseOperatorMHa(s,pic);
+        readOperatorMHa(s,pic);
     }else if (cur=="MHb"){
-        leseOperatorMHb(s,pic);
+        readOperatorMHa(s,pic);
     }else{
-        GreyScale::error("No PGM image");
+        GreyScale::error("No PGM or MH image");
     }
 
     return s;
 }
 
-std::ostream &operator<<(ostream &s, const GreyScale &pic) {
+void writeOperatorP2(ostream &s,const GreyScale &pic){
     s.write("P2\n", 3);
 
     string cur = to_string(pic.getWidth()) + " " + to_string(pic.getHeight()) + "\n";
@@ -237,6 +239,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
             } else {
                 cur = to_string((int) round(pic(i, j) * 255));
             }
+
             if (cur.length() == 1) {//0-9, add two space before number
                 s.write("  ", 2);
             } else if (cur.length() == 2) {//10-99, add one space before number
@@ -247,6 +250,58 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
         }
         s.write("\n", 1);
     }
+}
+
+void writeOperatorP5(ostream &s, const GreyScale &pic){
+    s.write("P2\n", 3);
+
+    string cur = to_string(pic.getWidth()) + " " + to_string(pic.getHeight()) + "\n";
+    s.write(cur.data(), (long) cur.length());
+
+    s.write("255\n", 4);
+
+    for (int i = 0; i < pic.getHeight(); i++) {
+        for (int j = 0; j < pic.getWidth(); j++) {
+            unsigned char curChar;
+            if(pic(i,j)<0){
+                curChar=255;
+            }else if(pic(i, j) > 1){
+                curChar=0;
+            }else{
+                curChar=(int)round(pic(i, j) * 255);
+            }
+            s.put(curChar);//ostream& put (char c);
+        }
+        s.write("\n", 1);
+    }
+}
+
+void writeOperatorMHa(ostream &s, const GreyScale &pic){
+      
+}
+
+void writeOperatorMHb(ostream &s, const GreyScale &pic){
+
+}
+
+std::ostream &operator<<(ostream &s, const GreyScale &pic) {
+    switch (pic.format){
+        case 0://why I can't use the enum P2 here?
+            writeOperatorP2(s,pic);
+            break;
+        case 1:
+            writeOperatorP5(s,pic);
+            break;
+        case 2:
+            writeOperatorMHa(s,pic);
+            break;
+        case 3:
+            writeOperatorMHb(s,pic);
+            break;
+        default:
+            break;
+    }
+
     return s;
 }
 
@@ -410,4 +465,24 @@ GreyScale &GreyScale::sobel() {
 void GreyScale::error(const char str[]) {
     std::cerr << "\nFehler: " << str << '\n' << std::endl;
     std::abort();
+}
+
+void GreyScale::setFormat(int i){
+    switch (i){
+        case 0:
+            format=P2;
+            break;
+        case 1:
+            format=P5;
+            break;
+        case 2:
+            format=MHa;
+            break;
+        case 3:
+            format=MHb;
+            break;
+        default:
+            GreyScale::error("SetNumber shoulb be in 0-3.");
+            break;
+    }
 }
