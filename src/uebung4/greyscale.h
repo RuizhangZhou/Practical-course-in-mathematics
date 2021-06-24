@@ -14,14 +14,14 @@ private:
     unique_ptr<vector<vector<float>>> matrix;
     
 public:
-    enum formats{//am I right to write the enum declaration here?
+    enum format_set{//am I right to write the enum declaration here?
         P2,
         P5,
         MHa,
         MHb
     };
 
-    static formats format;
+    static format_set format;
 
     struct Node {
         byte value;
