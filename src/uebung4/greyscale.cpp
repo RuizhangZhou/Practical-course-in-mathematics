@@ -253,8 +253,8 @@ void writeOperatorP2(ostream &s,const GreyScale &pic){
 }
 
 void writeOperatorP5(ostream &s, const GreyScale &pic){
-    s.write("P2\n", 3);
-
+    s.write("P5\n", 3);
+    
     string cur = to_string(pic.getWidth()) + " " + to_string(pic.getHeight()) + "\n";
     s.write(cur.data(), (long) cur.length());
 
@@ -289,7 +289,7 @@ std::ostream &operator<<(ostream &s, const GreyScale &pic) {
         case 0://why I can't use the enum P2 here?
             writeOperatorP2(s,pic);
             break;
-        case 1:
+        case 1://
             writeOperatorP5(s,pic);
             break;
         case 2:
