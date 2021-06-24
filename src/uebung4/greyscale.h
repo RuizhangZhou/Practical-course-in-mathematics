@@ -23,6 +23,12 @@ public:
 
     static formats format;
 
+    struct Node {
+        byte value;
+        int freq;
+        Node *p0, *p1;
+    }
+    
     GreyScale();
 
     GreyScale(int height, int width);

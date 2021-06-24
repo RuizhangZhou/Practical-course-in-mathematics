@@ -194,6 +194,14 @@ void readOperatorPGM(istream &s, GreyScale &pic,string magicNumber){
     }
 }
 
+void constHuffCode(unsigned int[] &histogram, Node &root) {
+
+}
+
+void readTransformation(GreyScale &pic) {
+    
+}
+
 void readOperatorMHa(istream &s, GreyScale &pic){
 
 }
@@ -274,6 +282,18 @@ void writeOperatorP5(ostream &s, const GreyScale &pic){
         }
         s.write("\n", 1);
     }
+}
+
+void calcHistogram(unsigned int[] &histogram, const GreyScale &pic) {
+
+}
+
+void valueToCode(Node &tree, int[] &valueToCode) {
+
+}
+
+void writeTransformation(GreyScale &pic) {
+
 }
 
 void writeOperatorMHa(ostream &s, const GreyScale &pic){
