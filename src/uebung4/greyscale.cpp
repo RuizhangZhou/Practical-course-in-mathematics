@@ -276,20 +276,33 @@ void readOperatorMHb(istream &s, GreyScale &pic) {
 }
 
 std::istream &operator>>(istream &s, GreyScale &pic) {
-    string cur;
-    while (s.peek() != '\n') {
-        cur += (char) s.get();
-    }
-    remove_comment(s);
-
-    if (cur == "P2" || cur == "P5") {
-        readOperatorPGM(s, pic, cur);
-    } else if (cur == "MHa") {
-        readOperatorMHa(s, pic);
-    } else if (cur == "MHb") {
-        readOperatorMHa(s, pic);
+    char c;
+    s >> c;
+    if (c == 'P') {
+        s >> c;
+        if (c == '2') {
+            readOperatorP2(s, pic);
+        } else if (c == '5') {
+            readOperatorP5(s, pic);
+        } else {
+            GreyScale::error("Wrong format");
+        }
+    } else if (c == 'M') {
+        s >> c;
+        if (c == 'H') {
+            s >> c;
+            if (c == 'a') {
+                readOperatorMHa(s, pic);
+            } else if (c == 'b') {
+                readOperatorMHb(s, pic);
+            } else {
+                GreyScale::error("Wrong format");
+            }
+        } else {
+            GreyScale::error("Wrong format");
+        }
     } else {
-        GreyScale::error("No PGM or MH image");
+        GreyScale::error("Wrong format");
     }
 
     return s;
