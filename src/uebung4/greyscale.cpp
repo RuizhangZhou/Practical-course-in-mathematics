@@ -7,7 +7,7 @@
 
 using namespace std;
 
-typedef map<unsigned int, unsigned int> Histogram;
+typedef vector<unsigned int> Histogram;
 
 GreyScale::GreyScale() {
     matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
