@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <map>
+#include <queue>
 
 #include "greyscale.h"
 
@@ -197,7 +198,35 @@ void readOperatorPGM(istream &s, GreyScale &pic, string magicNumber) {
 }
 
 void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
-
+    auto flipped_histogram = make_unique<priority_queue<GreyScale::Node, vector<GreyScale::Node>, greater<>>>();
+    for (int i = 0; i < 256; i++) {
+        if (histogram[i] != 0) {
+            auto node = make_unique<GreyScale::Node>();
+            node->value = (byte) i;
+            node->freq = histogram[i];
+            flipped_histogram->push(*node);
+        }
+    }
+    while (flipped_histogram->size() > 2) {
+        auto node1 = make_unique<GreyScale::Node>(flipped_histogram->top());
+        flipped_histogram->pop();
+        auto node2 = make_unique<GreyScale::Node>(flipped_histogram->top());
+        flipped_histogram->pop();
+        auto node = make_unique<GreyScale::Node>();
+        node->value = min(node1->value, node2->value);
+        node->freq = node1->freq + node2->freq;
+        node->p0 = move(node1);
+        node->p1 = move(node2);
+        flipped_histogram->push(*node);
+    }
+    auto node1 = make_unique<GreyScale::Node>(flipped_histogram->top());
+    flipped_histogram->pop();
+    auto node2 = make_unique<GreyScale::Node>(flipped_histogram->top());
+    flipped_histogram->pop();
+    root.value = min(node1->value, node2->value);
+    root.freq = node1->freq + node2->freq;
+    root.p0 = move(node1);
+    root.p1 = move(node2);
 }
 
 void readTransformation(GreyScale &pic) {
