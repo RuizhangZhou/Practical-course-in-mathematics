@@ -21,7 +21,7 @@ public:
         MHb
     };
 
-    static format_set format;
+    format_set format;
 
     struct Node {
         byte value;
@@ -82,7 +82,7 @@ public:
 
     static void error(const char str[]);
 
-    static void setFormat(int);
+    void setFormat(int);
 };
 
 
