@@ -163,7 +163,7 @@ inline int get_number(istream &s) {
     return stoi(cur);
 }
 
-void readOperatorPGM(istream &s, GreyScale &pic,string magicNumber){
+void readOperatorPGM(istream &s, GreyScale &pic, string magicNumber) {
     int width = get_number(s);
     s >> ws;
     if (!isdigit(s.peek())) {
@@ -175,21 +175,21 @@ void readOperatorPGM(istream &s, GreyScale &pic,string magicNumber){
 
     auto max_val = (float) get_number(s);
     remove_comment(s);
-    
+
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             remove_comment(s);
             check_good(s);
-            if(magicNumber=="P2"){
+            if (magicNumber == "P2") {
                 pic(i, j) = ((float) get_number(s)) / max_val;
-            }else if(magicNumber=="P5"){
-                pic(i,j)=((float) s.get()/max_val);
+            } else if (magicNumber == "P5") {
+                pic(i, j) = ((float) s.get() / max_val);
                 //the return value of get() is int, 
                 //so hier can automatically transfer the char to corresponding ASCII code?
             }
         }
     }
-    
+
     remove_comment(s);
     if (not s.eof()) {
         GreyScale::error("Has not reached end of file.");
@@ -201,14 +201,14 @@ void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
 }
 
 void readTransformation(GreyScale &pic) {
-    
-}
-
-void readOperatorMHa(istream &s, GreyScale &pic){
 
 }
 
-void readOperatorMHb(istream &s, GreyScale &pic){
+void readOperatorMHa(istream &s, GreyScale &pic) {
+
+}
+
+void readOperatorMHb(istream &s, GreyScale &pic) {
 
 }
 
@@ -219,20 +219,20 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
     }
     remove_comment(s);
 
-    if(cur=="P2"||cur=="P5"){
-        readOperatorPGM(s,pic,cur);
-    }else if (cur=="MHa"){
-        readOperatorMHa(s,pic);
-    }else if (cur=="MHb"){
-        readOperatorMHa(s,pic);
-    }else{
+    if (cur == "P2" || cur == "P5") {
+        readOperatorPGM(s, pic, cur);
+    } else if (cur == "MHa") {
+        readOperatorMHa(s, pic);
+    } else if (cur == "MHb") {
+        readOperatorMHa(s, pic);
+    } else {
         GreyScale::error("No PGM or MH image");
     }
 
     return s;
 }
 
-void writeOperatorP2(ostream &s,const GreyScale &pic){
+void writeOperatorP2(ostream &s, const GreyScale &pic) {
     s.write("P2\n", 3);
 
     string cur = to_string(pic.getWidth()) + " " + to_string(pic.getHeight()) + "\n";
@@ -262,9 +262,9 @@ void writeOperatorP2(ostream &s,const GreyScale &pic){
     }
 }
 
-void writeOperatorP5(ostream &s, const GreyScale &pic){
+void writeOperatorP5(ostream &s, const GreyScale &pic) {
     s.write("P5\n", 3);
-    
+
     string cur = to_string(pic.getWidth()) + " " + to_string(pic.getHeight()) + "\n";
     s.write(cur.data(), (long) cur.length());
 
@@ -273,12 +273,12 @@ void writeOperatorP5(ostream &s, const GreyScale &pic){
     for (int i = 0; i < pic.getHeight(); i++) {
         for (int j = 0; j < pic.getWidth(); j++) {
             unsigned char curChar;
-            if(pic(i,j)<0){
-                curChar=255;
-            }else if(pic(i, j) > 1){
-                curChar=0;
-            }else{
-                curChar=(int)round(pic(i, j) * 255);
+            if (pic(i, j) < 0) {
+                curChar = 255;
+            } else if (pic(i, j) > 1) {
+                curChar = 0;
+            } else {
+                curChar = (int) round(pic(i, j) * 255);
             }
             s.put(curChar);//ostream& put (char c);
         }
@@ -298,27 +298,27 @@ void writeTransformation(GreyScale &pic) {
 
 }
 
-void writeOperatorMHa(ostream &s, const GreyScale &pic){
-      
+void writeOperatorMHa(ostream &s, const GreyScale &pic) {
+
 }
 
-void writeOperatorMHb(ostream &s, const GreyScale &pic){
+void writeOperatorMHb(ostream &s, const GreyScale &pic) {
 
 }
 
 std::ostream &operator<<(ostream &s, const GreyScale &pic) {
-    switch (pic.format){
+    switch (pic.format) {
         case 0://why I can't use the enum P2 here?
-            writeOperatorP2(s,pic);
+            writeOperatorP2(s, pic);
             break;
         case 1://
-            writeOperatorP5(s,pic);
+            writeOperatorP5(s, pic);
             break;
         case 2:
-            writeOperatorMHa(s,pic);
+            writeOperatorMHa(s, pic);
             break;
         case 3:
-            writeOperatorMHb(s,pic);
+            writeOperatorMHb(s, pic);
             break;
         default:
             break;
@@ -489,19 +489,19 @@ void GreyScale::error(const char str[]) {
     std::abort();
 }
 
-void GreyScale::setFormat(int i){
-    switch (i){
+void GreyScale::setFormat(int i) {
+    switch (i) {
         case 0:
-            format=P2;
+            format = P2;
             break;
         case 1:
-            format=P5;
+            format = P5;
             break;
         case 2:
-            format=MHa;
+            format = MHa;
             break;
         case 3:
-            format=MHb;
+            format = MHb;
             break;
         default:
             GreyScale::error("SetNumber shoulb be in 0-3.");
