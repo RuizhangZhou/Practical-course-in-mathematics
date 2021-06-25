@@ -1,11 +1,13 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 #include "greyscale.h"
 
 using namespace std;
 
+typedef const map<unsigned int, unsigned int> Histogram;
 
 GreyScale::GreyScale() {
     matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
@@ -194,7 +196,7 @@ void readOperatorPGM(istream &s, GreyScale &pic,string magicNumber){
     }
 }
 
-void constHuffCode(unsigned int[] &histogram, Node &root) {
+void constHuffCode(Histogram &histogram, GreyScale::Node &root) {
 
 }
 
@@ -206,7 +208,7 @@ void readOperatorMHa(istream &s, GreyScale &pic){
 
 }
 
-void readOperatorMHa(istream &s, GreyScale &pic){
+void readOperatorMHb(istream &s, GreyScale &pic){
 
 }
 
@@ -284,11 +286,11 @@ void writeOperatorP5(ostream &s, const GreyScale &pic){
     }
 }
 
-void calcHistogram(unsigned int[] &histogram, const GreyScale &pic) {
+void calcHistogram(Histogram &histogram, const GreyScale &pic) {
 
 }
 
-void valueToCode(Node &tree, int[] &valueToCode) {
+void valueToCode(GreyScale::Node &tree, Histogram &histogram) {
 
 }
 
