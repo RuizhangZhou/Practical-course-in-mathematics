@@ -197,6 +197,17 @@ void readOperatorPGM(istream &s, GreyScale &pic, string magicNumber) {
     }
 }
 
+inline unsigned long read_number(istream &s, int number_of_bytes = 4) {
+    unsigned int i = 0;
+    unsigned char c = 0;
+    for (int j = 0; j < number_of_bytes; j++) {
+        i <<= 8;
+        s >> c;
+        i |= c;
+    }
+    return i;
+}
+
 void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
     auto flipped_histogram = make_unique<priority_queue<GreyScale::Node, vector<GreyScale::Node>, greater<>>>();
     for (int i = 0; i < 256; i++) {
@@ -234,7 +245,30 @@ void readTransformation(GreyScale &pic) {
 }
 
 void readOperatorMHa(istream &s, GreyScale &pic) {
-
+    int width = read_number(s, 2);
+    int height = read_number(s, 2);
+    pic.resize(width, height);
+    auto histogram = Histogram();
+    for (int i = 0; i < 256; i++) {
+        histogram[i] = read_number(s);
+    }
+    auto tree = make_shared<GreyScale::Node>();
+    constHuffCode(histogram, *tree);
+    int pos = 0;
+    unsigned char current_byte;
+    auto current_node = tree;
+    while (s.good() and pos < height * width) {
+        s >> current_byte;
+        for (unsigned char i = 0; i < 8 and pos < height * width; i++) {
+            tree = current_byte % 2 ? tree->p0 : tree->p1;
+            current_byte >>= 1;
+            if (current_node->p0 == nullptr) {
+                pic(pos % width, pos / width) = ((float) current_node->value) / 255;
+                current_node = tree;
+                pos++;
+            }
+        }
+    }
 }
 
 void readOperatorMHb(istream &s, GreyScale &pic) {
