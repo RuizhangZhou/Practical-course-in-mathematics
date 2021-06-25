@@ -35,11 +35,11 @@ public:
 
     GreyScale();
 
-    GreyScale(int height, int width);
+    GreyScale(int width, int height);
 
     GreyScale(const GreyScale &x);
 
-    void resize(int height, int width);
+    void resize(int width, int height);
 
     int getHeight() const;
 

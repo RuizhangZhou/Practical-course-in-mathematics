@@ -35,7 +35,7 @@ void display(const GreyScale &pic, int id, const char text[]) {
 
     for (int j = 0; j < pic.getHeight(); j++)  // Fuer alle Bildpunkte ...
         for (int i = 0; i < pic.getWidth(); i++) {
-            float gr = std::rint(pic(j, i) * 255);  // [0,1] auf [0,255] skalieren
+            float gr = std::rint(pic(i, j) * 255);  // [0,1] auf [0,255] skalieren
             if (gr > 255)
                 gr = 255;
             else if (gr < 0)
