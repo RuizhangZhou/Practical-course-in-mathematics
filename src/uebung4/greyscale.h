@@ -26,7 +26,7 @@ public:
     struct Node {
         byte value;
         int freq;
-        Node *p0, *p1;
+        unique_ptr<Node> p0, p1;
     };
     
     GreyScale();
