@@ -353,7 +353,7 @@ void calcHistogram(Histogram &histogram, const GreyScale &pic) {
 
 }
 
-void valueToCode(GreyScale::Node &tree, Histogram &histogram) {
+void valueToCode(GreyScale::Node &tree, vector<unsigned int> &histogram) {
 
 }
 
@@ -570,4 +570,37 @@ void GreyScale::setFormat(int i) {
             GreyScale::error("SetNumber shoulb be in 0-3.");
             break;
     }
+}
+
+bool GreyScale::Node::operator>(const Node &other) const {
+    return freq > other.freq or (freq == other.freq and value > other.value);
+}
+
+void GreyScale::Node::print() {
+    print(0);
+}
+
+string GreyScale::Node::spaces(int spaces) {
+    string s;
+    for (int i = 0; i < spaces; i++) {
+        s += " ";
+    }
+    return s;
+}
+
+void GreyScale::Node::print(int level) {
+    cout << spaces(level * 2) << "{" << endl;
+    cout << spaces(level * 2 + 2) << to_string((int) value) << endl;
+    cout << spaces(level * 2 + 2) << to_string(freq) << endl;
+    if (p0 != nullptr) {
+        p0->print(level + 1);
+    } else {
+        cout << spaces(level * 2 + 2) << "NULL" << endl;
+    }
+    if (p1 != nullptr) {
+        p1->print(level + 1);
+    } else {
+        cout << spaces(level * 2 + 2) << "NULL" << endl;
+    }
+    cout << spaces(level * 2) << "}" << endl;
 }

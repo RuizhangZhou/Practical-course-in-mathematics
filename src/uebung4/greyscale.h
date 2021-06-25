@@ -28,9 +28,13 @@ public:
         unsigned int freq;
         shared_ptr<Node> p0, p1;
 
-        bool operator>(const Node &other) const {
-            return freq > other.freq or (freq == other.freq and value > other.value);
-        }
+        bool operator>(const Node &other) const;
+        void print();
+
+    private:
+        static string spaces(int spaces);
+
+        void print(int level);
     };
 
     GreyScale();
