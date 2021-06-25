@@ -384,16 +384,16 @@ void writeOperatorMHb(ostream &s, const GreyScale &pic) {
 
 std::ostream &operator<<(ostream &s, const GreyScale &pic) {
     switch (pic.format) {
-        case 0://why I can't use the enum P2 here?
+        case GreyScale::P2:
             writeOperatorP2(s, pic);
             break;
-        case 1://
+        case GreyScale::P5:
             writeOperatorP5(s, pic);
             break;
-        case 2:
+        case GreyScale::MHa:
             writeOperatorMHa(s, pic);
             break;
-        case 3:
+        case GreyScale::MHb:
             writeOperatorMHb(s, pic);
             break;
         default:

@@ -21,7 +21,7 @@ public:
         MHb
     };
 
-    format_set format;
+    format_set format = P2;
 
     struct Node {
         byte value;
