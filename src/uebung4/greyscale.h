@@ -27,7 +27,7 @@ public:
         byte value;
         int freq;
         Node *p0, *p1;
-    }
+    };
     
     GreyScale();
 
