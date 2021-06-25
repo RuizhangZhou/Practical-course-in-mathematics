@@ -7,7 +7,7 @@
 
 using namespace std;
 
-typedef const map<unsigned int, unsigned int> Histogram;
+typedef map<unsigned int, unsigned int> Histogram;
 
 GreyScale::GreyScale() {
     matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
@@ -196,7 +196,7 @@ void readOperatorPGM(istream &s, GreyScale &pic,string magicNumber){
     }
 }
 
-void constHuffCode(Histogram &histogram, GreyScale::Node &root) {
+void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
 
 }
 
