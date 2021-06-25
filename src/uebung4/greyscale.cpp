@@ -164,7 +164,9 @@ inline int get_number(istream &s) {
     return stoi(cur);
 }
 
-void readOperatorPGM(istream &s, GreyScale &pic, string magicNumber) {
+void readOperatorP2(istream &s, GreyScale &pic) {
+    remove_comment(s);
+
     int width = get_number(s);
     s >> ws;
     if (!isdigit(s.peek())) {
@@ -172,6 +174,7 @@ void readOperatorPGM(istream &s, GreyScale &pic, string magicNumber) {
     }
     int height = get_number(s);
     pic.resize(width, height);
+
     remove_comment(s);
 
     auto max_val = (float) get_number(s);
@@ -181,13 +184,7 @@ void readOperatorPGM(istream &s, GreyScale &pic, string magicNumber) {
         for (int j = 0; j < width; j++) {
             remove_comment(s);
             check_good(s);
-            if (magicNumber == "P2") {
-                pic(j, i) = ((float) get_number(s)) / max_val;
-            } else if (magicNumber == "P5") {
-                pic(j, i) = ((float) s.get() / max_val);
-                //the return value of get() is int, 
-                //so hier can automatically transfer the char to corresponding ASCII code?
-            }
+            pic(j, i) = ((float) get_number(s)) / max_val;
         }
     }
 
@@ -202,10 +199,42 @@ inline unsigned long read_number(istream &s, int number_of_bytes = 4) {
     unsigned char c = 0;
     for (int j = 0; j < number_of_bytes; j++) {
         i <<= 8;
-        s >> c;
+        c = s.get(); // FUCK C++
         i |= c;
     }
     return i;
+}
+
+void readOperatorP5(istream &s, GreyScale &pic) {
+    remove_comment(s);
+
+    int width = get_number(s);
+    s >> ws;
+    if (!isdigit(s.peek())) {
+        GreyScale::error("wrong format");
+    }
+    int height = get_number(s);
+    pic.resize(width, height);
+
+    remove_comment(s);
+
+    auto max_val = (float) get_number(s);
+
+    s.get();
+
+    int bytes = max_val > 255 ? 2 : 1;
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            pic(j, i) = (float) read_number(s, bytes) / max_val;
+        }
+    }
+
+    s.get();
+
+    if (not s.eof()) {
+        GreyScale::error("Has not reached end of file.");
+    }
 }
 
 void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
@@ -348,17 +377,16 @@ void writeOperatorP5(ostream &s, const GreyScale &pic) {
 
     for (int i = 0; i < pic.getHeight(); i++) {
         for (int j = 0; j < pic.getWidth(); j++) {
-            unsigned char curChar;
+            unsigned char current;
             if (pic(j, i) < 0) {
-                curChar = 255;
+                current = 0;
             } else if (pic(j, i) > 1) {
-                curChar = 0;
+                current = 255;
             } else {
-                curChar = (int) round(pic(j, i) * 255);
+                current = (unsigned char) round(pic(j, i) * 255);
             }
-            s.put(curChar);//ostream& put (char c);
+            s.put(current);
         }
-        s.write("\n", 1);
     }
 }
 
