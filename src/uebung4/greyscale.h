@@ -8,11 +8,11 @@
 using namespace std;
 
 class GreyScale {
-    
+
 private:
 
     unique_ptr<vector<vector<float>>> matrix;
-    
+
 public:
     enum format_set{//am I right to write the enum declaration here?
         P2,
@@ -25,10 +25,14 @@ public:
 
     struct Node {
         byte value;
-        int freq;
-        unique_ptr<Node> p0, p1;
+        unsigned int freq;
+        shared_ptr<Node> p0, p1;
+
+        bool operator>(const Node &other) const {
+            return freq > other.freq or (freq == other.freq and value > other.value);
+        }
     };
-    
+
     GreyScale();
 
     GreyScale(int height, int width);
