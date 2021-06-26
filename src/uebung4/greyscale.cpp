@@ -407,9 +407,10 @@ void calcHistogram(Histogram &histogram, const GreyScale &pic) {
 }
 
 void calcValueToCode(GreyScale::Node &tree, unsigned int code, int length, vector<tuple<unsigned int, int>> &valueToCode) {
-    if (tree.p0 = nullptr) {
+    if (tree.p0 == nullptr) {
         tuple<unsigned int, int> result(code, length); 
         valueToCode[(int) tree.value] = result;
+        return;
     }
     
     unsigned int l, r;
@@ -444,7 +445,7 @@ void writeOperatorMHa(ostream &s, const GreyScale &pic) {
     auto histogram = Histogram(256, 0);
     calcHistogram(histogram, pic);
     
-    struct GreyScale::Node tree;
+    GreyScale::Node tree;
     constHuffCode(histogram, tree);
     
     vector<tuple<unsigned int, int>> valueToCode(256);
