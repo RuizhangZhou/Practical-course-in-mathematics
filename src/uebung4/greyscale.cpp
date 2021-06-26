@@ -287,7 +287,7 @@ void readOperatorMHa(istream &s, GreyScale &pic) {
     unsigned char current_byte;
     auto current_node = tree;
     while (s.good() and pos < height * width) {
-        s >> current_byte;
+        current_byte = s.get();
         for (unsigned char i = 0; i < 8 and pos < height * width; i++) {
             current_node = (current_byte >> 7) == 0 ? current_node->p0 : current_node->p1;
             current_byte <<= 1;
@@ -306,9 +306,9 @@ void readOperatorMHb(istream &s, GreyScale &pic) {
 
 std::istream &operator>>(istream &s, GreyScale &pic) {
     char c;
-    s >> c;
+    c = s.get();
     if (c == 'P') {
-        s >> c;
+        c = s.get();
         if (c == '2') {
             readOperatorP2(s, pic);
         } else if (c == '5') {
@@ -317,9 +317,9 @@ std::istream &operator>>(istream &s, GreyScale &pic) {
             GreyScale::error("Wrong format");
         }
     } else if (c == 'M') {
-        s >> c;
+        c = s.get();
         if (c == 'H') {
-            s >> c;
+            c = s.get();
             if (c == 'a') {
                 readOperatorMHa(s, pic);
             } else if (c == 'b') {
