@@ -277,7 +277,7 @@ void readOperatorMHa(istream &s, GreyScale &pic) {
     int width = read_number(s, 2);
     int height = read_number(s, 2);
     pic.resize(width, height);
-    auto histogram = Histogram();
+    auto histogram = Histogram(256);
     for (int i = 0; i < 256; i++) {
         histogram[i] = read_number(s);
     }
