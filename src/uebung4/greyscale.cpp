@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <map>
 #include <queue>
+#include <vector>
+#include<tuple>
 
 #include "greyscale.h"
 
@@ -269,9 +271,9 @@ void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
     root.p1 = move(node2);
 }
 
-void readTransformation(GreyScale &pic) {
+/*void readTransformation(GreyScale &pic) {
 
-}
+}*/
 
 void readOperatorMHa(istream &s, GreyScale &pic) {
     int width = read_number(s, 2);
@@ -391,19 +393,97 @@ void writeOperatorP5(ostream &s, const GreyScale &pic) {
 }
 
 void calcHistogram(Histogram &histogram, const GreyScale &pic) {
-
+    for (int i = 0; i < pic.getHeight(); i++) {
+        for (int j = 0; j < pic.getWidth(); j++) {
+            if (pic(j, i) < 0) {
+                histogram[0] += 1;
+            } else if (pic(j, i) > 1) {
+                histogram[255] += 1;
+            } else {
+                 histogram[(unsigned int) round(pic(j, i) * 255)] += 1;
+            }
+        }
+    }
 }
 
-void valueToCode(GreyScale::Node &tree, vector<unsigned int> &histogram) {
+void calcValueToCode(GreyScale::Node &tree, unsigned int code, int length, vector<tuple<unsigned int, int>> &valueToCode) {
+    if (tree.p0 = nullptr) {
+        tuple<unsigned int, int> result(code, length); 
+        valueToCode[(int) tree.value] = result;
+    }
+    
+    unsigned int l, r;
+    
+    length++;
 
+    l = (code << 1);
+    calcValueToCode(*(tree.p0), l, length, valueToCode);
+
+    r = (code << 1) | 1;
+    calcValueToCode(*(tree.p1), r, length, valueToCode);
 }
 
 void writeTransformation(GreyScale &pic) {
 
 }
 
-void writeOperatorMHa(ostream &s, const GreyScale &pic) {
+void write_number(ostream &s, unsigned int number, int number_of_bytes) {
+    unsigned char c;
+    for (int i = number_of_bytes - 1; i >= 0; i--) {
+        c = 0;
+        c |= number >> (8 * i);
+        s.put(c);
+    }
+}
 
+void writeOperatorMHa(ostream &s, const GreyScale &pic) {
+    s.write("MHa", 3);
+    write_number(s, (unsigned int) pic.getWidth(), 2);
+    write_number(s, (unsigned int) pic.getHeight(), 2);
+    
+    auto histogram = Histogram(256, 0);
+    calcHistogram(histogram, pic);
+    
+    struct GreyScale::Node tree;
+    constHuffCode(histogram, tree);
+    
+    vector<tuple<unsigned int, int>> valueToCode(256);
+    calcValueToCode(tree, 0, 0, valueToCode);
+    
+    unsigned int currCode;
+    int currLength;
+    unsigned char currByte = 0;
+    int leftLength = 8;
+    for (int i = 0; i < pic.getHeight(); i++) {
+        for (int j = 0; j < pic.getWidth(); j++) {
+            if (pic(j, i) < 0) {
+                currCode = get<0>(valueToCode[0]);
+            } else if (pic(j, i) > 1) {
+                currCode = get<0>(valueToCode[255]);
+            } else {
+                currCode = get<0>(valueToCode[(unsigned int) round(pic(j, i) * 255)]);
+            }
+            
+            currLength = get<1>(valueToCode[(unsigned int) round(pic(j, i) * 255)]);
+            for (int k = 0; k < currLength; k++) {
+                if (leftLength == 0) {
+                    s.put(currByte);
+                    currByte = 0;
+                    leftLength = 8;
+                }
+                if (((currCode >> (currLength - 1 - k)) & 1) == 1) {
+                    currByte = (currByte << 1) | 1;
+                } else {
+                    currByte = currByte << 1;
+                }
+                leftLength--;
+            }
+        }
+    }
+    if (leftLength != 8) {
+        currByte = currByte << leftLength;
+        s.put(currByte);
+    }
 }
 
 void writeOperatorMHb(ostream &s, const GreyScale &pic) {
