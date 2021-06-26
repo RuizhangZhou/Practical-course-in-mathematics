@@ -289,8 +289,8 @@ void readOperatorMHa(istream &s, GreyScale &pic) {
     while (s.good() and pos < height * width) {
         s >> current_byte;
         for (unsigned char i = 0; i < 8 and pos < height * width; i++) {
-            tree = current_byte % 2 ? tree->p0 : tree->p1;
-            current_byte >>= 1;
+            current_node = (current_byte >> 7) == 0 ? current_node->p0 : current_node->p1;
+            current_byte <<= 1;
             if (current_node->p0 == nullptr) {
                 pic(pos % width, pos / width) = ((float) current_node->value) / 255;
                 current_node = tree;
