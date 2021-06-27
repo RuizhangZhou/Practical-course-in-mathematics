@@ -11,6 +11,7 @@
 using namespace std;
 
 typedef vector<unsigned int> Histogram;
+GreyScale::format_set GreyScale::format;
 
 GreyScale::GreyScale() {
     matrix = make_unique<vector<vector<float>>>(0, vector<float>(0));
@@ -271,10 +272,6 @@ void constHuffCode(const Histogram &histogram, GreyScale::Node &root) {
     root.p1 = move(node2);
 }
 
-/*void readTransformation(GreyScale &pic) {
-
-}*/
-
 void readOperatorMHa(istream &s, GreyScale &pic) {
     int width = read_number(s, 2);
     int height = read_number(s, 2);
@@ -303,7 +300,36 @@ void readOperatorMHa(istream &s, GreyScale &pic) {
 }
 
 void readOperatorMHb(istream &s, GreyScale &pic) {
-
+    int numberElements;
+    int average;
+    int newValue;
+    readOperatorMHa(s, pic);
+    for (int i = 0; i < pic.getHeight(); i++) {
+        for (int j = 0; j < pic.getWidth(); j++) {
+            numberElements = 0;
+            average = 0;
+            if (j - 1 >= 0 && i - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j - 1,i - 1) * 255);
+            }
+            if (i - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j,i - 1) * 255);
+            }
+            if (j + 1 < pic.getWidth() && i - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j + 1,i - 1) * 255);
+            }
+            if (j - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j - 1,i) * 255);
+            }
+            if (numberElements > 0) {
+                newValue = ((int) round(pic(j,i) * 255) + (average/numberElements)) % 256;
+                pic(j,i) = ((float) newValue) / 255;
+            } 
+        }
+    }
 }
 
 std::istream &operator>>(istream &s, GreyScale &pic) {
@@ -424,9 +450,6 @@ void calcValueToCode(GreyScale::Node &tree, unsigned int code, int length, vecto
     calcValueToCode(*(tree.p1), r, length, valueToCode);
 }
 
-void writeTransformation(GreyScale &pic) {
-
-}
 
 void write_number(ostream &s, unsigned int number, int number_of_bytes) {
     unsigned char c;
@@ -437,13 +460,22 @@ void write_number(ostream &s, unsigned int number, int number_of_bytes) {
     }
 }
 
-void writeOperatorMHa(ostream &s, const GreyScale &pic) {
-    s.write("MHa", 3);
+void writeOperatorHuff(ostream &s, const GreyScale &pic) {
+    if (pic.format == GreyScale::MHa) {
+        s.write("MHa", 3);    
+    } else if (pic.format == GreyScale::MHb) {
+        s.write("MHb", 3); 
+    }
+    
     write_number(s, (unsigned int) pic.getWidth(), 2);
     write_number(s, (unsigned int) pic.getHeight(), 2);
     
     auto histogram = Histogram(256, 0);
     calcHistogram(histogram, pic);
+
+    for (int i = 0; i < 256; i++) {
+        write_number(s, histogram[i], 4);
+    }
     
     GreyScale::Node tree;
     constHuffCode(histogram, tree);
@@ -487,22 +519,57 @@ void writeOperatorMHa(ostream &s, const GreyScale &pic) {
     }
 }
 
-void writeOperatorMHb(ostream &s, const GreyScale &pic) {
 
+
+void writeOperatorMHb(ostream &s, const GreyScale &pic) {
+    int numberElements;
+    int average;
+    int newValue;
+    GreyScale transPic = pic;
+    for (int i = pic.getHeight() - 1; i >= 0; i--) {
+        for (int j = pic.getWidth() - 1; j >= 0; j--) {
+            numberElements = 0;
+            average = 0;
+            if (j - 1 >= 0 && i - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j - 1,i - 1) * 255);
+            }
+            if (i - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j,i - 1) * 255);
+            }
+            if (j + 1 < pic.getWidth() && i - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j + 1,i - 1) * 255);
+            }
+            if (j - 1 >= 0) {
+                numberElements++;
+                average += (int) round(pic(j - 1,i) * 255);
+            }
+            if (numberElements > 0) {
+                newValue = ((int) round(pic(j,i) * 255) - (average/numberElements));
+                if (newValue < 0) {
+                    newValue += 256;
+                }
+                transPic(j,i) = ((float) newValue) / 255;
+            } 
+        }
+    }
+    writeOperatorHuff(s, transPic);
 }
 
 std::ostream &operator<<(ostream &s, const GreyScale &pic) {
     switch (pic.format) {
-        case GreyScale::P2:
+        case 0:
             writeOperatorP2(s, pic);
             break;
-        case GreyScale::P5:
+        case 1:
             writeOperatorP5(s, pic);
             break;
-        case GreyScale::MHa:
-            writeOperatorMHa(s, pic);
+        case 2:
+            writeOperatorHuff(s, pic);
             break;
-        case GreyScale::MHb:
+        case 3:
             writeOperatorMHb(s, pic);
             break;
         default:
@@ -677,16 +744,16 @@ void GreyScale::error(const char str[]) {
 void GreyScale::setFormat(int i) {
     switch (i) {
         case 0:
-            format = P2;
+            GreyScale::format = P2;
             break;
         case 1:
-            format = P5;
+            GreyScale::format = P5;
             break;
         case 2:
-            format = MHa;
+            GreyScale::format = MHa;
             break;
         case 3:
-            format = MHb;
+            GreyScale::format = MHb;
             break;
         default:
             GreyScale::error("SetNumber shoulb be in 0-3.");

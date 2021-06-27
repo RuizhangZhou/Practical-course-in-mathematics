@@ -123,9 +123,14 @@ int main(int argc, char* argv[]) {
 
 #ifdef SET_FORMAT
             case 'f':  // Output-Format
-                std::cout << "Output format... (0) PGM-Ascii (1) PGM-Raw (2) Huffman (3) Huffman-Dist\n"
-                          << "Enter format: ";
-                std::cin >> frmt;
+                if (numArg < argc) {
+                    frmt = argv[numArg][0] - '0';
+                    numArg++;
+                } else {
+                    std::cout << "Output format... (0) PGM-Ascii (1) PGM-Raw (2) Huffman (3) Huffman-Dist\n"
+                            << "Enter format: ";
+                    std::cin >> frmt;
+                }
                 GreyScale::setFormat(frmt);
                 break;
 #endif
