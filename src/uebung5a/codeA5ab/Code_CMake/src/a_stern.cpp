@@ -426,6 +426,9 @@ int main() {
             PruefeWeg(example,weg);
         }
             
+    }else {
+        cout << "Ungültige Beispielnummer." << endl;
+        return -1;
     }
         
 
