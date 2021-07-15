@@ -250,7 +250,7 @@ void Dijkstra(const DistanceGraph &g, VertexT start, std::vector<CostT> &kostenZ
     }
 }
 
-extern vector<CostT> f_v;//f(v)=g(v)+h(v)
+vector<CostT> f_v;//f(v)=g(v)+h(v)
 
 bool comp(const VertexT &a,const VertexT &b){
     return f_v[a] > f_v[b];
@@ -259,12 +259,12 @@ bool comp(const VertexT &a,const VertexT &b){
 bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, VertexT ziel, std::list<VertexT> &weg) {
     // ...
     vector<CostT> g_v;
-    vector<VertexT> vorgaenger;
+    vector<VertexT> vorgaenger(g.numVertices());
     vector<VertexT> bekannteKnoten;
     vector<VertexStatus> statuses(g.numVertices());
 
     bekannteKnoten.push_back(start);
-    for (auto i = 0; i < g.numVertices(); i++) {
+    for (size_t i = 0; i < g.numVertices(); i++) {
         g_v.push_back(infty);
         f_v.push_back(infty);
         statuses.push_back(VertexStatus::UnknownVertex);
