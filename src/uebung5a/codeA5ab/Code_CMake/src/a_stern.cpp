@@ -411,10 +411,23 @@ int main() {
         maze = ErzeugeLabyrinth(256, 256, seed);
         MazeGraph graph(maze, 256, 256);
         //which start and goal should we choose here?
-    } else {
-        cout << "Ungültige Beispielnummer." << endl;
-        return -1;
+        VertexT start=undefinedVertex;
+        VertexT goal=undefinedVertex;
+        for(size_t i=0;i<graph.numVertices();i++){
+            if(maze[i]==CellType::Start){
+                start=i;
+            }
+            if(maze[i]== CellType::Destination){
+                goal=i;
+            }
+        }
+        list<VertexT> weg(graph.numVertices());
+        if(A_star(graph,start,goal,weg)){
+            PruefeWeg(example,weg);
+        }
+            
     }
+        
 
     // Loese die in der Aufgabenstellung beschriebenen Probleme fuer die jeweilige Datei
     // PruefeDijkstra / PruefeWeg
