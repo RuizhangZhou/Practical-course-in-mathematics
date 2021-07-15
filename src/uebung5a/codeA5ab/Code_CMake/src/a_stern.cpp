@@ -216,7 +216,7 @@ istream &operator>>(istream &s, CoordinateGraph &graph) {
     return s;
 }
 
-void Dijkstra(const DistanceGraph &g, GraphVisualizer &v, VertexT start, std::vector<CostT> &kostenZumStart) {
+void Dijkstra(const DistanceGraph &g, VertexT start, std::vector<CostT> &kostenZumStart) {
     map<VertexT, CostT> remaining;
     for (size_t i = 0; i < g.numVertices(); i++) {
         if (i == start) {
@@ -302,6 +302,14 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
     return false; // Kein Weg gefunden.
 }
 
+void dijkstra_test(const DistanceGraph &graph, int example) {
+    for (size_t v = 0; v < graph.numVertices(); v++) {
+        vector<CostT> cost(graph.numVertices());
+        Dijkstra(graph, v, cost);
+        PruefeDijkstra(example, v, cost);
+    }
+}
+
 int main() {
     // Frage Beispielnummer vom User ab
     // Lade die zugehoerige Textdatei in einen Graphen
@@ -312,28 +320,32 @@ int main() {
 
     if (example == 1) {
         ShortDistEucliGraph graph;
-        ifstream s("Graph1.dat");
+        ifstream s("daten/Graph1.dat");
         s >> graph;
         PruefeHeuristik(graph);
+        dijkstra_test(graph, 1);
     } else if (example == 2) {
         CircEucliGraph graph;
-        ifstream s("Graph2.dat");
+        ifstream s("daten/Graph2.dat");
         s >> graph;
         PruefeHeuristik(graph);
+        dijkstra_test(graph, 2);
     } else if (example == 3) {
         LongDistCoordGraph graph;
-        ifstream s("Graph3.dat");
+        ifstream s("daten/Graph3.dat");
         s >> graph;
         PruefeHeuristik(graph);
+        dijkstra_test(graph, 3);
     } else if (example == 4) {
         TimeCoordGraph graph;
-        ifstream s("Graph4.dat");
+        ifstream s("daten/Graph4.dat");
         s >> graph;
         PruefeHeuristik(graph);
+        dijkstra_test(graph, 4);
     } else if (example >= 5 && example <= 9) {
         MazeGraph graph;
         int num = example - 4;
-        string file = "Maze" + to_string(num) + ".dat";
+        string file = "daten/Maze" + to_string(num) + ".dat";
         ifstream s(file);
         s >> graph;
         PruefeHeuristik(graph);
