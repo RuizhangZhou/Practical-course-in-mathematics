@@ -1,2 +1,3 @@
 build/*
 debug/*
+!lib/unit.cpp.o
