@@ -261,15 +261,17 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
     vector<CostT> g_v;
     vector<VertexT> vorgaenger;
     vector<VertexT> bekannteKnoten;
-    vector<VertexT> untersuchterKnoten;
+    vector<VertexStatus> statuses(g.numVertices());
 
     bekannteKnoten.push_back(start);
     for (auto i = 0; i < g.numVertices(); i++) {
         g_v.push_back(infty);
         f_v.push_back(infty);
+        statuses.push_back(VertexStatus::UnknownVertex);
     }
     g_v[start] = 0;
     f_v[start] = g.estimatedCost(start, ziel);
+    statuses[start]=VertexStatus::InQueue;
 
     while (!bekannteKnoten.empty()) {
         //use the priority queue(make_heap) which mentioned in the script
@@ -289,16 +291,17 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
             }
             return true;
         }
-        bekannteKnoten.pop_back();//remove the minVertexT
-        untersuchterKnoten.push_back(minVertexT);
+        bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
+        statuses[minVertexT]=VertexStatus::Done;
         for (auto curE : g.getNeighbors(minVertexT)) {
-            if (find(untersuchterKnoten.begin(), untersuchterKnoten.end(), curE.first) == untersuchterKnoten.end()) {
+            if (statuses[curE.first]!=VertexStatus::Done) {
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
                 if (newg_v < g_v[curE.first]) {
                     vorgaenger[curE.first] = minVertexT;
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
+                statuses[curE.first]=VertexStatus::InQueue;//as long as it's not "Done", all set as "InQueue"(no matter it's "Unknown" or "inQueue");
             }
         }
     }
