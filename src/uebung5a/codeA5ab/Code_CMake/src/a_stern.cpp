@@ -264,8 +264,10 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
     vector<VertexStatus> statuses(g.numVertices());
 
     bekannteKnoten.push_back(start);
+    f_v.clear();
     for (size_t i = 0; i < g.numVertices(); i++) {
         g_v.push_back(infty);
+        
         f_v.push_back(infty);
         statuses.push_back(VertexStatus::UnknownVertex);
     }
