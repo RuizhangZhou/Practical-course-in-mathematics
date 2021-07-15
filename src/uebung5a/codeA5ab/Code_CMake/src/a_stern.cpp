@@ -14,6 +14,15 @@ using namespace std;
 
 // Ein Graph, der Koordinaten von Knoten speichert.
 class CoordinateGraph : public DistanceGraph {
+public:
+    /*
+    struct VertexT {
+        CostT fv;
+        bool operator>(const VertexT &other) const{
+            return fv > other.fv;
+        }
+    };
+    */
 protected:
     vector<NeighborT> adjacencyList;
     vector<pair<double,double>> coordinates;
@@ -52,11 +61,6 @@ public:
 
     void addCoordinates(int vertex, pair<double, double> coord) {
         coordinates[vertex] = coord;
-    }
-
-    void updateCost(VertexT from, VertexT to, CostT newCost) const{
-        EdgeT curEdge(from,to);//key
-        costsMap[curEdge]=newCost;//how to update the key-value pair in <map>?
     }
 
     friend std::istream& operator>>(std::istream&, CoordinateGraph&);
@@ -222,42 +226,41 @@ void Dijkstra(const DistanceGraph& g, GraphVisualizer& v, VertexT start, std::ve
 
 bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT ziel, std::list<VertexT>& weg) {
     // ...
+    vector<CostT> f_v;//f(v)=g(v)+h(v)
+    vector<VertexT> vorgaenger;
     vector<VertexT> bekannteKnoten;
     vector<VertexT> untersuchterKnoten;
-    bekannteKnoten.push_back(start);
-    while(!bekannteKnoten.empty()){
-        /*use the priority queue(make_heap) which mentioned in the script
-        //here should compare the VertexT by g.cost(start,this)+g.estimateCost(this,ziel)
 
-        make_heap(bekannteKnoten.begin(),bekannteKnoten.end(),greater<>{});//smallest value at the front,but how to rewrite the comparator for VertexT here?
-        pop_heap(bekannteKnoten.begin(),bekannteKnoten.end(),greater<>{});//smallest value move to the back
-        VertexT curVertexT=bekannteKnoten.back();//now curVertexT is the smallest one
-        weg.push_back(curVertexT);
-        bekannteKnoten.pop_back();
-        */
-        VertexT minVertexT=undefinedVertex;
-        CostT minCost=infty;
-        for (VertexT v:bekannteKnoten){//loop to find the minVertexT
-            CostT curCost=g.cost(start,v)+g.estimatedCost(v,ziel);//f(v)=g(v)+h(v)
-            if(curCost<minCost){
-                minVertexT=v;
-                minCost=curCost;
-            }
-        }
-        weg.push_back(minVertexT);
+    bekannteKnoten.push_back(start);
+    for(auto i=0;i<g.numVertices();i++){
+        f_v.push_back(infty);
+    }
+    f_v[start]=g.estimatedCost(start,ziel);
+
+    while(!bekannteKnoten.empty()){
+        //use the priority queue(make_heap) which mentioned in the script
+        //here should compare the VertexT by f_v
+
+        make_heap(bekannteKnoten.begin(),bekannteKnoten.end(),greater<VertexT>());//smallest value at the front,but how to rewrite the comparator for VertexT here?
+        pop_heap(bekannteKnoten.begin(),bekannteKnoten.end(),greater<VertexT>());//smallest value move to the back
+        VertexT minVertexT=bekannteKnoten.back();//now curVertexT is the smallest one
         if(minVertexT==ziel){
+            VertexT curV=ziel;
+            weg.push_front(ziel);
+            while(curV!=start){
+                curV=vorgaenger[curV];
+                weg.push_front(curV);
+            }
             return true;
         }
-        remove(bekannteKnoten.begin(),bekannteKnoten.end(),minVertexT);
+        bekannteKnoten.pop_back();//remove the minVertexT
         untersuchterKnoten.push_back(minVertexT);
-        auto curNeighborTs=g.getNeighbors(minVertexT);
-        for (auto localEdgeT : curNeighborTs){
-            // if this neighbor isn't untersucht, then add it into the bekannteKnoten
-            if(find(untersuchterKnoten.begin(),untersuchterKnoten.end(),localEdgeT.first)==untersuchterKnoten.end()){
-                bekannteKnoten.push_back(localEdgeT.first);
-                CostT newCost=g.cost(start,minVertexT)+localEdgeT.second;
-                if(newCost < g.cost(start,localEdgeT.first)){
-                    g.updateCost(start,localEdgeT.first,newCost);//g is a DistanceGraph, but the updateCost I defined in the Herachie classes, how to debug it?
+        for (auto curE : g.getNeighbors(minVertexT)){
+            if(find(untersuchterKnoten.begin(),untersuchterKnoten.end(),curE.first)==untersuchterKnoten.end()){
+                CostT newf_v=f_v[minVertexT]+g.cost(minVertexT,curE.first)+g.estimatedCost(curE.first,ziel);
+                if(newf_v<f_v[curE.first]){
+                    vorgaenger[curE.first]=minVertexT;
+                    f_v[curE.first]=newf_v;
                 }
             }
         }
