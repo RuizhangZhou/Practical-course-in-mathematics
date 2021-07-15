@@ -4,17 +4,33 @@
 #include <vector>
 #include <algorithm>//make_heap
 #include <functional>//greater
+#include <map>
 
 using namespace std;
 
 // Ein Graph, der Koordinaten von Knoten speichert.
 class CoordinateGraph : public DistanceGraph {
+    map<EdgeT,CostT> costsMap;//I'm not sure, maybe use a map to memory all the costs of edges and costs?
 public:
     const NeighborT getNeighbors( VertexT v) const override;
     
     CostT estimatedCost( VertexT from, VertexT to) const override;
     
-    CostT cost( VertexT from, VertexT to) const override;
+    CostT cost( VertexT from, VertexT to) const override{
+        //map<EdgeT,CostT> :: iterator it;
+        EdgeT curEdge(from,to);//key
+        auto iter=costsMap.find(curEdge);
+        if(iter==costsMap.end()){//can't find
+            return infty;
+        }else{//find
+            return iter->second;//value
+        }
+    }
+
+    void updateCost(VertexT from, VertexT to, CostT newCost) const{
+        EdgeT curEdge(from,to);//key
+        costsMap[curEdge]=newCost;//how to update the key-value pair in <map>?
+    }
 };
 
 class DisCoordGraph : public CoordinateGraph {
@@ -84,6 +100,10 @@ bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT z
             // if this neighbor isn't untersucht, then add it into the bekannteKnoten
             if(find(untersuchterKnoten.begin(),untersuchterKnoten.end(),localEdgeT.first)==untersuchterKnoten.end()){
                 bekannteKnoten.push_back(localEdgeT.first);
+                CostT newCost=g.cost(start,minVertexT)+localEdgeT.second;
+                if(newCost < g.cost(start,localEdgeT.first)){
+                    g.updateCost(start,localEdgeT.first,newCost);//g is a DistanceGraph, but the updateCost I defined in the Herachie classes, how to debug it?
+                }
             }
         }
     }
