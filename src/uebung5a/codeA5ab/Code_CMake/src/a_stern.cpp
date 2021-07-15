@@ -250,25 +250,27 @@ void Dijkstra(const DistanceGraph &g, VertexT start, std::vector<CostT> &kostenZ
     }
 }
 
+
 vector<CostT> f_v;//f(v)=g(v)+h(v)
 
 bool comp(const VertexT &a,const VertexT &b){
     return f_v[a] > f_v[b];
 }
 
+
 bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, VertexT ziel, std::list<VertexT> &weg) {
     // ...
+    //vector<CostT> f_v;//f(v)=g(v)+h(v)
     vector<CostT> g_v;
     vector<VertexT> vorgaenger(g.numVertices());
     vector<VertexT> bekannteKnoten;
     vector<VertexStatus> statuses(g.numVertices());
-
     bekannteKnoten.push_back(start);
     f_v.clear();
     for (size_t i = 0; i < g.numVertices(); i++) {
         g_v.push_back(infty);
-        
         f_v.push_back(infty);
+        vorgaenger.push_back(undefinedVertex);
         statuses.push_back(VertexStatus::UnknownVertex);
     }
     g_v[start] = 0;
@@ -276,13 +278,28 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
     statuses[start]=VertexStatus::InQueue;
 
     while (!bekannteKnoten.empty()) {
+        
         //use the priority queue(make_heap) which mentioned in the script
         //here should compare the VertexT by f_v
 
-        make_heap(bekannteKnoten.begin(), bekannteKnoten.end(),
-                  comp);//smallest value at the front,but how to rewrite the comparator for VertexT here?
+        make_heap(bekannteKnoten.begin(), bekannteKnoten.end(),comp);//smallest value at the front,but how to rewrite the comparator for VertexT here?
         pop_heap(bekannteKnoten.begin(), bekannteKnoten.end(), comp);//smallest value move to the back
         VertexT minVertexT = bekannteKnoten.back();//now curVertexT is the smallest one
+        bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
+        
+
+        /*
+        VertexT minVertexT=undefinedVertex;
+        CostT minCost=infty;
+        for(auto vertex : bekannteKnoten){
+            if(f_v[vertex] < minCost){
+                minCost=f_v[vertex];
+                minVertexT=vertex;
+            }
+        }
+        remove(bekannteKnoten.begin(),bekannteKnoten.end(),minVertexT);
+        */
+
         if (minVertexT == ziel) {
             VertexT curV = ziel;
             weg.clear();
@@ -293,7 +310,7 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
             }
             return true;
         }
-        bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
+        
         statuses[minVertexT]=VertexStatus::Done;
         for (auto curE : g.getNeighbors(minVertexT)) {
             if (statuses[curE.first]!=VertexStatus::Done) {
@@ -303,7 +320,10 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
-                statuses[curE.first]=VertexStatus::InQueue;//as long as it's not "Done", all set as "InQueue"(no matter it's "Unknown" or "inQueue");
+                if(statuses[curE.first]==VertexStatus::UnknownVertex){
+                    statuses[curE.first]=VertexStatus::InQueue;
+                    bekannteKnoten.push_back(curE.first);
+                }                
             }
         }
     }
@@ -321,9 +341,12 @@ void dijkstra_test(const DistanceGraph &graph, int example) {
 void a_star_test(const DistanceGraph &g, int example){
     for(size_t v1=0; v1<g.numVertices();v1++){
         for(size_t v2=0;v2<g.numVertices();v2++){
-            list<VertexT> weg(g.numVertices());
-            A_star(g,v1,v2,weg);
-            PruefeWeg(example,weg);
+            if(v1!=v2){
+                list<VertexT> weg(g.numVertices());
+                if(A_star(g,v1,v2,weg)){
+                    PruefeWeg(example,weg);
+                }
+            }
         }
     }
 }
@@ -375,8 +398,9 @@ int main() {
             auto start = pair.first;
             auto goal  = pair.second;
             list<VertexT> weg(graph.numVertices());
-            A_star(graph,start,goal,weg);
-            PruefeWeg(example,weg);
+            if(A_star(graph,start,goal,weg)){
+                PruefeWeg(example,weg);
+            }
             //(Berechne den kuerzesten Weg von start zu goal)
         }
     } else if (example == 10) {
