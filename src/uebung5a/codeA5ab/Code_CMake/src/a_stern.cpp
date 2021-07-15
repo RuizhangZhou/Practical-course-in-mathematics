@@ -14,15 +14,6 @@ using namespace std;
 
 // Ein Graph, der Koordinaten von Knoten speichert.
 class CoordinateGraph : public DistanceGraph {
-public:
-    /*
-    struct VertexT {
-        CostT fv;
-        bool operator>(const VertexT &other) const{
-            return fv > other.fv;
-        }
-    };
-    */
 protected:
     vector<NeighborT> adjacencyList;
     vector<pair<double,double>> coordinates;
@@ -64,6 +55,7 @@ public:
     }
 
     friend std::istream& operator>>(std::istream&, CoordinateGraph&);
+
 };
 
 class EucliGraph : public CoordinateGraph {
@@ -226,6 +218,7 @@ void Dijkstra(const DistanceGraph& g, GraphVisualizer& v, VertexT start, std::ve
 
 bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT ziel, std::list<VertexT>& weg) {
     // ...
+    vector<CostT> g_v;
     vector<CostT> f_v;//f(v)=g(v)+h(v)
     vector<VertexT> vorgaenger;
     vector<VertexT> bekannteKnoten;
@@ -233,8 +226,10 @@ bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT z
 
     bekannteKnoten.push_back(start);
     for(auto i=0;i<g.numVertices();i++){
+        g_v.push_back(infty);
         f_v.push_back(infty);
     }
+    g_v[start]=0;
     f_v[start]=g.estimatedCost(start,ziel);
 
     while(!bekannteKnoten.empty()){
@@ -257,10 +252,11 @@ bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT z
         untersuchterKnoten.push_back(minVertexT);
         for (auto curE : g.getNeighbors(minVertexT)){
             if(find(untersuchterKnoten.begin(),untersuchterKnoten.end(),curE.first)==untersuchterKnoten.end()){
-                CostT newf_v=f_v[minVertexT]+g.cost(minVertexT,curE.first)+g.estimatedCost(curE.first,ziel);
-                if(newf_v<f_v[curE.first]){
+                CostT newg_v=g_v[minVertexT]+g.cost(minVertexT,curE.first);
+                if(newg_v < g_v[curE.first]){
                     vorgaenger[curE.first]=minVertexT;
-                    f_v[curE.first]=newf_v;
+                    g_v[curE.first]=newg_v;
+                    f_v[curE.first]=newg_v+g.estimatedCost(curE.first,ziel);
                 }
             }
         }
