@@ -231,22 +231,26 @@ void Dijkstra(const DistanceGraph &g, GraphVisualizer &v, VertexT start, std::ve
         remaining[t.first] = t.second;
     }
 
-    while (not remaining.empty()) {
+    bool all_infinite = false;
+    while (not remaining.empty() and not all_infinite) {
         pair<VertexT, CostT> minimal = make_pair(0, infty);
         for (pair<VertexT, CostT> p : remaining) {
             if (p.second < minimal.second) {
                 minimal = p;
             }
         }
+        if (minimal.second != infty) {
+            remaining.erase(minimal.first);
+            kostenZumStart[minimal.first] = minimal.second;
 
-        remaining.erase(minimal.first);
-        kostenZumStart[minimal.first] = minimal.second;
-
-        for (pair<VertexT, CostT> t : g.getNeighbors(minimal.first)) {
-            if (remaining.find(t.first) !=
-                remaining.end()) { //There is no contains method in a map, this is a common workaround.
-                remaining[t.first] = min(minimal.second + t.second, remaining[t.first]);
+            for (pair<VertexT, CostT> t : g.getNeighbors(minimal.first)) {
+                if (remaining.find(t.first) !=
+                    remaining.end()) { //There is no contains method in a map, this is a common workaround.
+                    remaining[t.first] = min(minimal.second + t.second, remaining[t.first]);
+                }
             }
+        } else {
+            all_infinite = true;
         }
     }
 }
