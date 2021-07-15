@@ -217,7 +217,38 @@ istream &operator>>(istream &s, CoordinateGraph &graph) {
 }
 
 void Dijkstra(const DistanceGraph &g, GraphVisualizer &v, VertexT start, std::vector<CostT> &kostenZumStart) {
-    // ...
+    map<VertexT, CostT> remaining;
+    for (size_t i = 0; i < g.numVertices(); i++) {
+        if (i == start) {
+            kostenZumStart[i] = 0;
+        } else {
+            kostenZumStart[i] = infty;
+            remaining[i] = infty;
+        }
+    }
+
+    for (pair<VertexT, CostT> t : g.getNeighbors(start)) {
+        remaining[t.first] = t.second;
+    }
+
+    while (not remaining.empty()) {
+        pair<VertexT, CostT> minimal = make_pair(0, infty);
+        for (pair<VertexT, CostT> p : remaining) {
+            if (p.second < minimal.second) {
+                minimal = p;
+            }
+        }
+
+        remaining.erase(minimal.first);
+        kostenZumStart[minimal.first] = minimal.second;
+
+        for (pair<VertexT, CostT> t : g.getNeighbors(minimal.first)) {
+            if (remaining.find(t.first) !=
+                remaining.end()) { //There is no contains method in a map, this is a common workaround.
+                remaining[t.first] = min(minimal.second + t.second, remaining[t.first]);
+            }
+        }
+    }
 }
 
 bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT ziel, std::list<VertexT> &weg) {
