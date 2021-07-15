@@ -2,6 +2,9 @@
 #include "astern/text_visualizer.h"
 #include "astern/unit.h"
 #include "astern/mazegraph.h"
+#include <iostream>
+#include <fstream>
+#include <math.h>
 #include <vector>
 #include <algorithm>//make_heap
 #include <functional>//greater
