@@ -253,7 +253,7 @@ void Dijkstra(const DistanceGraph &g, VertexT start, std::vector<CostT> &kostenZ
 
 vector<CostT> f_v;//f(v)=g(v)+h(v)//global variable than can be got from any function
 
-bool comp(const VertexT &a,const VertexT &b){
+bool comp(const VertexT &a, const VertexT &b) {
     return f_v[a] > f_v[b];
 }
 
@@ -275,7 +275,7 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
     }
     g_v[start] = 0;
     f_v[start] = g.estimatedCost(start, ziel);
-    statuses[start]=VertexStatus::InQueue;
+    statuses[start] = VertexStatus::InQueue;
 
     while (!bekannteKnoten.empty()) {
         //use the priority queue(make_heap) which mentioned in the script
@@ -286,7 +286,7 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
         pop_heap(bekannteKnoten.begin(), bekannteKnoten.end(), comp);//smallest value move to the back
         VertexT minVertexT = bekannteKnoten.back();//now curVertexT is the smallest one
         bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
-        
+
         /*
         VertexT minVertexT=undefinedVertex;
         CostT minCost=infty;
@@ -310,19 +310,19 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
             return true;
         }
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
-        statuses[minVertexT]=VertexStatus::Done;
+        statuses[minVertexT] = VertexStatus::Done;
         for (auto curE : g.getNeighbors(minVertexT)) {
-            if (statuses[curE.first]!=VertexStatus::Done) {
+            if (statuses[curE.first] != VertexStatus::Done) {
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
                 if (newg_v < g_v[curE.first]) {
                     vorgaenger[curE.first] = minVertexT;
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
-                if(statuses[curE.first]==VertexStatus::UnknownVertex){
-                    statuses[curE.first]=VertexStatus::InQueue;
+                if (statuses[curE.first] == VertexStatus::UnknownVertex) {
+                    statuses[curE.first] = VertexStatus::InQueue;
                     bekannteKnoten.push_back(curE.first);
-                }                
+                }
             }
         }
     }
@@ -337,13 +337,13 @@ void dijkstra_test(const DistanceGraph &graph, int example) {
     }
 }
 
-void a_star_test(const DistanceGraph &g, int example){
-    for(size_t v1=0; v1<g.numVertices();v1++){
-        for(size_t v2=0;v2<g.numVertices();v2++){
-            if(v1!=v2){
+void a_star_test(const DistanceGraph &g, int example) {
+    for (size_t v1 = 0; v1 < g.numVertices(); v1++) {
+        for (size_t v2 = 0; v2 < g.numVertices(); v2++) {
+            if (v1 != v2) {
                 list<VertexT> weg(g.numVertices());
-                if(A_star(g,v1,v2,weg)){
-                    PruefeWeg(example,weg);
+                if (A_star(g, v1, v2, weg)) {
+                    PruefeWeg(example, weg);
                 }
             }
         }
@@ -364,28 +364,28 @@ int main() {
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 1);
-        a_star_test(graph,1);
+        a_star_test(graph, 1);
     } else if (example == 2) {
         CircEucliGraph graph;
         ifstream s("daten/Graph2.dat");
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 2);
-        a_star_test(graph,2);
+        a_star_test(graph, 2);
     } else if (example == 3) {
         LongDistCoordGraph graph;
         ifstream s("daten/Graph3.dat");
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 3);
-        a_star_test(graph,3);
+        a_star_test(graph, 3);
     } else if (example == 4) {
         TimeCoordGraph graph;
         ifstream s("daten/Graph4.dat");
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 4);
-        a_star_test(graph,4);
+        a_star_test(graph, 4);
     } else if (example >= 5 && example <= 9) {
         MazeGraph graph;
         int num = example - 4;
@@ -393,12 +393,12 @@ int main() {
         ifstream s(file);
         s >> graph;
         PruefeHeuristik(graph);
-        for ( auto pair : StartZielPaare(example)) {
+        for (auto pair : StartZielPaare(example)) {
             auto start = pair.first;
-            auto goal  = pair.second;
+            auto goal = pair.second;
             list<VertexT> weg(graph.numVertices());
-            if(A_star(graph,start,goal,weg)){
-                PruefeWeg(example,weg);
+            if (A_star(graph, start, goal, weg)) {
+                PruefeWeg(example, weg);
             }
             //(Berechne den kuerzesten Weg von start zu goal)
         }
@@ -410,26 +410,26 @@ int main() {
         maze = ErzeugeLabyrinth(256, 256, seed);
         MazeGraph graph(maze, 256, 256);
         //which start and goal should we choose here?
-        VertexT start=undefinedVertex;
-        VertexT goal=undefinedVertex;
-        for(size_t i=0;i<graph.numVertices();i++){
-            if(maze[i]==CellType::Start){
-                start=i;
+        VertexT start = undefinedVertex;
+        VertexT goal = undefinedVertex;
+        for (size_t i = 0; i < graph.numVertices(); i++) {
+            if (maze[i] == CellType::Start) {
+                start = i;
             }
-            if(maze[i]== CellType::Destination){
-                goal=i;
+            if (maze[i] == CellType::Destination) {
+                goal = i;
             }
         }
         list<VertexT> weg(graph.numVertices());
-        if(A_star(graph,start,goal,weg)){
-            PruefeWeg(example,weg);
+        if (A_star(graph, start, goal, weg)) {
+            PruefeWeg(example, weg);
         }
-            
-    }else {
+
+    } else {
         cout << "Ungültige Beispielnummer." << endl;
         return -1;
     }
-        
+
 
     // Loese die in der Aufgabenstellung beschriebenen Probleme fuer die jeweilige Datei
     // PruefeDijkstra / PruefeWeg
