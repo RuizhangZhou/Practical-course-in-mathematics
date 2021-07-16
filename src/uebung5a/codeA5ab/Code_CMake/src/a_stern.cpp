@@ -7,7 +7,6 @@
 #include <math.h>
 #include <vector>
 #include <algorithm>//make_heap
-#include <functional>//greater
 #include <map>
 
 using namespace std;
@@ -92,6 +91,7 @@ public:
     }
 
     CostT estimatedCost(VertexT from, VertexT to) const override {
+        //if from and to are not neighbors, cost(from,to)=cost(to,from)=infty
         double distance = min(euclideanDistance(from, to), min(cost(from, to), cost(to, from)));
         return distance;
     }
@@ -126,7 +126,7 @@ public:
 
     virtual ~LonLatCoordGraph() {}
 
-    double latLongToDist(VertexT from, VertexT to) const {
+    double latLongToDist(VertexT from, VertexT to) const {//coordinates here are Longitude and Latitude
         double earthRadius = 6378.388;
         double lon1 = coordinates[from].second * M_PI / 180;
         double lon2 = coordinates[to].second * M_PI / 180;
@@ -178,7 +178,7 @@ public:
     }
 
     CostT estimatedCost(VertexT from, VertexT to) const override {
-        return (latLongToDist(from, to) / 200.0) * 60.0;
+        return (latLongToDist(from, to) / 200.0) * 60.0;//estimate by driving a car with 200km/h
     }
 };
 
@@ -251,7 +251,7 @@ void Dijkstra(const DistanceGraph &g, VertexT start, std::vector<CostT> &kostenZ
 }
 
 
-vector<CostT> f_v;//f(v)=g(v)+h(v)
+vector<CostT> f_v;//f(v)=g(v)+h(v)//global variable than can be got from any function
 
 bool comp(const VertexT &a,const VertexT &b){
     return f_v[a] > f_v[b];
@@ -278,16 +278,15 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
     statuses[start]=VertexStatus::InQueue;
 
     while (!bekannteKnoten.empty()) {
-        
         //use the priority queue(make_heap) which mentioned in the script
         //here should compare the VertexT by f_v
 
-        make_heap(bekannteKnoten.begin(), bekannteKnoten.end(),comp);//smallest value at the front,but how to rewrite the comparator for VertexT here?
+        //make_heap(bekannteKnoten.begin(), bekannteKnoten.end(),comp);//smallest value at the front,but how to rewrite the comparator for VertexT here?
+        //pop_heap is enough, because it first make a heap, then move the top element to the end
         pop_heap(bekannteKnoten.begin(), bekannteKnoten.end(), comp);//smallest value move to the back
         VertexT minVertexT = bekannteKnoten.back();//now curVertexT is the smallest one
         bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
         
-
         /*
         VertexT minVertexT=undefinedVertex;
         CostT minCost=infty;
@@ -310,7 +309,7 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
             }
             return true;
         }
-        
+        //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
         statuses[minVertexT]=VertexStatus::Done;
         for (auto curE : g.getNeighbors(minVertexT)) {
             if (statuses[curE.first]!=VertexStatus::Done) {
