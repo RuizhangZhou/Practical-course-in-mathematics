@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
+#include <sstream>
 
 
 using namespace std;
@@ -17,6 +18,7 @@ const sf::Color BLUE = sf::Color(0x2196f3ff);
 const sf::Color DARK_GREY = sf::Color(0x546e7aff);
 const sf::Color DARK_GREEN = sf::Color(0x388e3cff);
 const sf::Color DARK_RED = sf::Color(0xd32f2fff);
+const sf::Color BLACK = sf::Color(0x212121ff);
 
 class CoordinateGraphVisualiser : public GraphVisualizer {
     struct VertexData {
@@ -41,6 +43,8 @@ class CoordinateGraphVisualiser : public GraphVisualizer {
 
     const CoordinateGraph &graph;
 
+    sf::Font font;
+
 public:
     CoordinateGraphVisualiser(const CoordinateGraph &graph, VertexT start, VertexT end) :
             vertex_data(graph.numVertices()),
@@ -61,10 +65,11 @@ public:
                 edge_data[make_pair(i, t.first)].status = EdgeStatus::UnknownEdge;
             }
         }
+        font.loadFromFile("font/BebasNeue-Regular.ttf");
     }
 
     ~CoordinateGraphVisualiser() override {
-
+        window.close();
     }
 
     void markVertex(VertexT vertex, VertexStatus status) override {
@@ -139,6 +144,18 @@ public:
                 }
                 vertex_shape.setPosition(get_x(graph.coordinates[i].second), get_y(graph.coordinates[i].first));
                 window.draw(vertex_shape);
+
+                ostringstream sstream, sstream2;
+                if (vertex_data[i].cost != infty) {
+                    sstream << round(vertex_data[i].cost * 100.0) / 100.0;
+                } else {
+                    sstream << "-";
+                }
+                sstream2 << round(vertex_data[i].estimate * 100.0) / 100.0;
+                sf::Text text(sstream.str() + "|" + sstream2.str(), font);
+                text.setPosition(get_x(graph.coordinates[i].second), get_y(graph.coordinates[i].first));
+                text.setFillColor(BLACK);
+                window.draw(text);
             }
 
             for (pair<EdgeT, EdgeData> t : edge_data) {
@@ -177,10 +194,10 @@ public:
                 double tip_y = line[0].position.y + 0.7 * (line[1].position.y - line[0].position.y);
                 double add_x = sin(rad) * 20;
                 double add_y = cos(rad) * 20;
-                double left_x = tip_x + invert * ( + add_x - add_y);
-                double left_y = tip_y + invert * (- add_y - add_x);
-                double right_x = tip_x + invert * ( - add_x - add_y);
-                double right_y = tip_y + invert * ( + add_y - add_x);
+                double left_x = tip_x + invert * (+add_x - add_y);
+                double left_y = tip_y + invert * (-add_y - add_x);
+                double right_x = tip_x + invert * (-add_x - add_y);
+                double right_y = tip_y + invert * (+add_y - add_x);
 
                 sf::Vertex triangle[] = {
                         sf::Vertex(sf::Vector2f(
@@ -197,11 +214,18 @@ public:
                         ), line_color)
                 };
                 window.draw(triangle, 3, sf::Triangles);
+
+                ostringstream sstream;
+                sstream << graph.cost(t.first.first, t.first.second);
+                sf::Text text(sstream.str(), font);
+                text.setPosition(tip_x, tip_y);
+                text.setFillColor(BLACK);
+                window.draw(text);
             }
 
 
             window.display();
-            sf::sleep(sf::milliseconds(1000));
+            sf::sleep(sf::milliseconds(100));
         }
     }
 };
