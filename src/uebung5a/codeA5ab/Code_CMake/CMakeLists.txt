@@ -38,7 +38,7 @@ include(${astern_SOURCE_DIR}/cmake/data_copy.cmake)
 # Handle Unit
 # ##############################################################################
 
-set(a_stern_unit include/astern/graphs.h)
+set(a_stern_unit include/astern/visualiser.h include/astern/graphs.h)
 if(APPLE)
   list(APPEND a_stern_unit lib/unit_mac.cpp.o)
 elseif(UNIX AND NOT APPLE)
