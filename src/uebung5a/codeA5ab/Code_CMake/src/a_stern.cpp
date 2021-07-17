@@ -9,6 +9,7 @@
 #include <algorithm>//make_heap
 #include <map>
 #include "astern/graphs.h"
+#include "astern/visualiser.h"
 
 using namespace std;
 
@@ -90,7 +91,7 @@ bool comp(const VertexT &a, const VertexT &b) {
 }
 
 
-bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, VertexT ziel, std::list<VertexT> &weg) {
+bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT ziel, std::list<VertexT> &weg) {
     // ...
     //vector<CostT> f_v;//f(v)=g(v)+h(v)
     vector<CostT> g_v;
@@ -98,16 +99,21 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
     vector<VertexT> bekannteKnoten;
     vector<VertexStatus> statuses(g.numVertices());
     bekannteKnoten.push_back(start);
+
     f_v.clear();
     for (size_t i = 0; i < g.numVertices(); i++) {
         g_v.push_back(infty);
         f_v.push_back(infty);
         vorgaenger.push_back(undefinedVertex);
         statuses.push_back(VertexStatus::UnknownVertex);
+        if (i != ziel) {
+            v.markVertex(i, VertexStatus::UnknownVertex);
+        }
     }
     g_v[start] = 0;
     f_v[start] = g.estimatedCost(start, ziel);
     statuses[start] = VertexStatus::InQueue;
+    v.markVertex(start, VertexStatus::InQueue);
 
     while (!bekannteKnoten.empty()) {
         //use the priority queue(make_heap) which mentioned in the script
@@ -118,6 +124,7 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
         pop_heap(bekannteKnoten.begin(), bekannteKnoten.end(), comp);//smallest value move to the back
         VertexT minVertexT = bekannteKnoten.back();//now curVertexT is the smallest one
         bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
+        v.markVertex(minVertexT, VertexStatus::Active);
 
         /*
         VertexT minVertexT=undefinedVertex;
@@ -143,20 +150,29 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
         }
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
         statuses[minVertexT] = VertexStatus::Done;
+        v.markEdge(make_pair(vorgaenger[minVertexT], minVertexT), EdgeStatus::Optimal);
+        v.draw();
         for (auto curE : g.getNeighbors(minVertexT)) {
+            v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Active);
             if (statuses[curE.first] != VertexStatus::Done) {
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
                 if (newg_v < g_v[curE.first]) {
                     vorgaenger[curE.first] = minVertexT;
+                    v.updateVertex(curE.first, newg_v, 0, minVertexT, VertexStatus::InQueue);
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
                 if (statuses[curE.first] == VertexStatus::UnknownVertex) {
                     statuses[curE.first] = VertexStatus::InQueue;
+                    v.markVertex(curE.first, VertexStatus::InQueue);
                     bekannteKnoten.push_back(curE.first);
                 }
             }
+            v.draw();
+            v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Visited);
         }
+        v.markVertex(minVertexT, VertexStatus::Done);
+        v.draw();
     }
     return false; // Kein Weg gefunden.
 }
@@ -169,12 +185,13 @@ void dijkstra_test(const DistanceGraph &graph, int example) {
     }
 }
 
-void a_star_test(const DistanceGraph &g, int example) {
+void a_star_test(const CoordinateGraph &g, int example) {
     for (size_t v1 = 0; v1 < g.numVertices(); v1++) {
         for (size_t v2 = 0; v2 < g.numVertices(); v2++) {
             if (v1 != v2) {
                 list<VertexT> weg(g.numVertices());
-                if (A_star(g, v1, v2, weg)) {
+                CoordinateGraphVisualiser v(g, v1, v2);
+                if (A_star(g, v, v1, v2, weg)) {
                     PruefeWeg(example, weg);
                 }
             }
