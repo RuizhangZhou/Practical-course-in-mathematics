@@ -53,7 +53,7 @@ endif()
 add_executable(a_stern src/a_stern.cpp ${a_stern_unit})
 
 # Setzt diese Variable auf true, wenn ihr Teil b bearbeitet
-option(teil_b OFF)
+option(teil_b ON)
 
 # ##############################################################################
 
