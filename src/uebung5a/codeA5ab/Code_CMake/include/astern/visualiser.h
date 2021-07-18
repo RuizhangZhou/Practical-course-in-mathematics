@@ -45,17 +45,19 @@ class CoordinateGraphVisualiser : public GraphVisualizer {
 
     sf::Font font;
 
+    bool show_texts;
+
 public:
-    CoordinateGraphVisualiser(const CoordinateGraph &graph, VertexT start, VertexT end) :
+    CoordinateGraphVisualiser(const CoordinateGraph &graph, VertexT start, VertexT end, bool show_texts = true) :
             vertex_data(graph.numVertices()),
             window(sf::VideoMode(1800, 1800), "My window"),
             start(start), end(end),
-            graph(graph) {
-        for (size_t i = 0; i < vertex_data.size(); i++) {
-            vertex_data[i].status = VertexStatus::UnknownVertex;
-            vertex_data[i].cost = infty;
-            vertex_data[i].estimate = graph.estimatedCost(i, end);
-            vertex_data[i].parent = SIZE_MAX;
+            graph(graph), show_texts(show_texts) {
+        for (auto &t : vertex_data) {
+            t.status = VertexStatus::UnknownVertex;
+            t.cost = infty;
+            t.estimate = infty;
+            t.parent = SIZE_MAX;
         }
         vertex_data[start].status = VertexStatus::Active;
         vertex_data[end].status = VertexStatus::Destination;
@@ -83,7 +85,7 @@ public:
     void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
         vertex_data[vertex].status = vertex == end ? VertexStatus::Destination : status;
         vertex_data[vertex].cost = cost;
-        //vertex_data[vertex].estimate = estimate; //Not needed because estimates are calculated in the constructor.
+        vertex_data[vertex].estimate = estimate;
         vertex_data[vertex].parent = parent;
     }
 
@@ -146,17 +148,23 @@ public:
                 vertex_shape.setPosition(get_x(graph.coordinates[i].second), get_y(graph.coordinates[i].first));
                 window.draw(vertex_shape);
 
-                ostringstream sstream, sstream2;
-                if (vertex_data[i].cost != infty) {
-                    sstream << round(vertex_data[i].cost * 100.0) / 100.0;
-                } else {
-                    sstream << "-";
+                if (show_texts) {
+                    ostringstream sstream, sstream2;
+                    if (vertex_data[i].cost != infty) {
+                        sstream << round(vertex_data[i].cost * 100.0) / 100.0;
+                    } else {
+                        sstream << "-";
+                    }
+                    if (vertex_data[i].estimate != infty) {
+                        sstream2 << round(vertex_data[i].estimate * 100.0) / 100.0;
+                    } else {
+                        sstream2 << "-";
+                    }
+                    sf::Text text(sstream.str() + "|" + sstream2.str(), font);
+                    text.setPosition(get_x(graph.coordinates[i].second), get_y(graph.coordinates[i].first));
+                    text.setFillColor(BLACK);
+                    window.draw(text);
                 }
-                sstream2 << round(vertex_data[i].estimate * 100.0) / 100.0;
-                sf::Text text(sstream.str() + "|" + sstream2.str(), font);
-                text.setPosition(get_x(graph.coordinates[i].second), get_y(graph.coordinates[i].first));
-                text.setFillColor(BLACK);
-                window.draw(text);
             }
 
             for (pair<EdgeT, EdgeData> t : edge_data) {
@@ -216,17 +224,37 @@ public:
                 };
                 window.draw(triangle, 3, sf::Triangles);
 
-                ostringstream sstream;
-                sstream << graph.cost(t.first.first, t.first.second);
-                sf::Text text(sstream.str(), font);
-                text.setPosition(tip_x, tip_y);
-                text.setFillColor(BLACK);
-                window.draw(text);
+                if (show_texts) {
+                    ostringstream sstream;
+                    sstream << graph.cost(t.first.first, t.first.second);
+                    sf::Text text(sstream.str(), font);
+                    text.setPosition(tip_x, tip_y);
+                    text.setFillColor(BLACK);
+                    window.draw(text);
+                }
             }
 
 
             window.display();
-            sf::sleep(sf::milliseconds(100));
+            sf::sleep(sf::milliseconds(200));
+        }
+    }
+
+    void finish() override {
+        while (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) // event loop
+            {
+                // "close requested" event: we close the window
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                } else if (event.type == sf::Event::Resized) {
+                    sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                    window.setView(sf::View(visibleArea));
+                }
+            }
+            draw();
+            sf::sleep(sf::milliseconds(10));
         }
     }
 };

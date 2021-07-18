@@ -143,14 +143,16 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             weg.clear();
             weg.push_front(ziel);
             while (curV != start) {
+                v.markEdge(make_pair(vorgaenger[curV], curV), EdgeStatus::Optimal);
                 curV = vorgaenger[curV];
                 weg.push_front(curV);
             }
+            v.draw();
+            v.finish();
             return true;
         }
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
         statuses[minVertexT] = VertexStatus::Done;
-        v.markEdge(make_pair(vorgaenger[minVertexT], minVertexT), EdgeStatus::Optimal);
         v.draw();
         for (auto curE : g.getNeighbors(minVertexT)) {
             v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Active);
@@ -158,7 +160,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
                 if (newg_v < g_v[curE.first]) {
                     vorgaenger[curE.first] = minVertexT;
-                    v.updateVertex(curE.first, newg_v, 0, minVertexT, VertexStatus::InQueue);
+                    v.updateVertex(curE.first, newg_v, g.estimatedCost(curE.first, ziel), minVertexT, VertexStatus::InQueue);
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
@@ -174,6 +176,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
         v.markVertex(minVertexT, VertexStatus::Done);
         v.draw();
     }
+    v.finish();
     return false; // Kein Weg gefunden.
 }
 
@@ -189,8 +192,12 @@ void a_star_test(const CoordinateGraph &g, int example) {
     for (size_t v1 = 0; v1 < g.numVertices(); v1++) {
         for (size_t v2 = 0; v2 < g.numVertices(); v2++) {
             if (v1 != v2) {
+                cout << "Sollen die Texte angezeigt werden? (y/n)" << endl;
+                char s;
+                cin >> s;
+                bool show_texts = s == 'y';
                 list<VertexT> weg(g.numVertices());
-                CoordinateGraphVisualiser v(g, v1, v2);
+                CoordinateGraphVisualiser v(g, v1, v2, show_texts);
                 if (A_star(g, v, v1, v2, weg)) {
                     PruefeWeg(example, weg);
                 }
