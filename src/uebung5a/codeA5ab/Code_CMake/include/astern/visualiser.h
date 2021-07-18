@@ -5,6 +5,7 @@
 #include <map>
 #include <cmath>
 #include <sstream>
+#include <iostream>
 
 
 using namespace std;
@@ -292,20 +293,19 @@ class MazeGraphVisualiser : public GraphVisualizer {
 public:
     MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
             vertex_data(graph.numVertices()),
-            window(sf::VideoMode(graph.width*10, graph.height*10), "My window"),
-            start(start), end(end), graph(graph){
-
+            window(sf::VideoMode(graph.width*5, graph.height*5), "My Window"),
+            start(start), end(end), graph(graph){  
         for (auto &t : vertex_data) {
             t.status = VertexStatus::UnknownVertex;
             t.cost = infty;
             t.estimate = infty;
-            t.parent = undefinedVertex;
+            t.parent = SIZE_MAX;
         }
         vertex_data[start].status = VertexStatus::Active;
         vertex_data[end].status = VertexStatus::Destination;
         
 
-        font.loadFromFile("font/BebasNeue-Regular.ttf");
+        //font.loadFromFile("font/BebasNeue-Regular.ttf");
     }
 
     ~MazeGraphVisualiser() override {
@@ -313,7 +313,7 @@ public:
     }
 
     void markVertex(VertexT vertex, VertexStatus status) override {
-        vertex_data[vertex].status = vertex == end ? VertexStatus::Destination : status;;
+        vertex_data[vertex].status = status;
     }
 
     void markEdge(EdgeT edge, EdgeStatus status) override {}
@@ -338,11 +338,9 @@ public:
                     window.setView(sf::View(visibleArea));
                 }
             }
-
             window.clear(sf::Color::White);
-
-            sf::RectangleShape vertex_shape(sf::Vector2f(10.f, 10.f));
-            size_t active=-1;
+            sf::RectangleShape vertex_shape(sf::Vector2f(5.f, 5.f));
+            size_t active=start;
             for (size_t i = 0; i < vertex_data.size(); i++) {
                 if (i == start) {
                     vertex_shape.setFillColor(RED);
@@ -360,27 +358,32 @@ public:
                 } else if (graph.nodes[i]==CellType::Ground){
                     vertex_shape.setFillColor(DARK_GREY);
                 }
-                vertex_shape.setPosition((i%graph.width)*10, (i/graph.width)*10);
+                
+                vertex_shape.setPosition((i%graph.width)*5, (i/graph.width)*5);
                 window.draw(vertex_shape);
             }
-
-            //draw the route from start to active vertex
+            
             VertexT curV=active;
             while(curV!=start){
+                if(vertex_data[curV].parent==start){
+                  break;
+                }
                 curV=vertex_data[curV].parent;
                 vertex_shape.setFillColor(GREEN);
-                vertex_shape.setPosition((curV%graph.width)*10, (curV/graph.width)*10);
+                vertex_shape.setPosition((curV%graph.width)*5, (curV/graph.width)*5);
                 window.draw(vertex_shape);
             }
-
+            
             window.display();
-            sf::sleep(sf::milliseconds(200));
+            sf::sleep(sf::milliseconds(50));
+
 
         }
     }
 
 
     void finish() override {
+        
         while (window.isOpen()) {
             sf::Event event;
             while (window.pollEvent(event)) // event loop
@@ -388,13 +391,18 @@ public:
                 // "close requested" event: we close the window
                 if (event.type == sf::Event::Closed) {
                     window.close();
-                } else if (event.type == sf::Event::Resized) {
+                } 
+                
+                else if (event.type == sf::Event::Resized) {
                     sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
                     window.setView(sf::View(visibleArea));
                 }
+                
             }
             draw();
             sf::sleep(sf::milliseconds(10));
         }
+        
     }
+    
 };

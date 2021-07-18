@@ -152,8 +152,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             return true;
         }
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
-        statuses[minVertexT] = VertexStatus::Done;
-        v.draw();
+        //v.draw();
         for (auto curE : g.getNeighbors(minVertexT)) {
             v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Active);
             if (statuses[curE.first] != VertexStatus::Done) {
@@ -173,6 +172,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             v.draw();
             v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Visited);
         }
+        statuses[minVertexT] = VertexStatus::Done;
         v.markVertex(minVertexT, VertexStatus::Done);
         v.draw();
     }
