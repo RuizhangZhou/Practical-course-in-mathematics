@@ -85,8 +85,31 @@ class MazeGraph : public DistanceGraph {
 
             return infty;
         }
+        
+        /*
+        CostT estimatedCost(VertexT from, VertexT to) const override {//norm0: zulässig
+            return 0;
+        }//result: just search it all the direction with the same opportunity
+        */
 
-        CostT estimatedCost(VertexT from, VertexT to) const override {
+        /*
+        CostT estimatedCost(VertexT from, VertexT to) const override {//norm1: zulässig
+            int heightFrom = from/width;
+            int heightTo = to/width;
+            int heightDiff = abs(heightTo - heightFrom);
+
+            int widthFrom = from % width;
+            int widthTo = to % width;
+            int widthDiff = abs(widthTo - widthFrom);
+
+            double dist = heightDiff+widthDiff;
+
+            return dist;
+        }
+        */
+        
+        
+        CostT estimatedCost(VertexT from, VertexT to) const override {//norm2: zulässig
             int heightFrom = from/width;
             int heightTo = to/width;
             int heightDiff = heightTo - heightFrom;
@@ -99,6 +122,27 @@ class MazeGraph : public DistanceGraph {
 
             return dist;
         }
+        
+
+        /*
+        CostT estimatedCost(VertexT from, VertexT to) const override {//2*norm2: nicht zulässig
+            int heightFrom = from/width;
+            int heightTo = to/width;
+            int heightDiff = heightTo - heightFrom;
+
+            int widthFrom = from % width;
+            int widthTo = to % width;
+            int widthDiff = widthTo - widthFrom;
+
+            double dist = 2* sqrt(pow(heightDiff, 2) + pow(widthDiff, 2));
+
+            return dist;
+        }
+        */
+        
+        
+
+
 
         void resisze(int num_verts) {
             vertexCount = num_verts;

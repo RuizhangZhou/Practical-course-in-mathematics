@@ -288,7 +288,9 @@ class MazeGraphVisualiser : public GraphVisualizer {
 
     const MazeGraph &graph;
 
-    sf::Font font;
+    //sf::Font font;
+    int drawCount;
+    int drawLoop;
 
 public:
     MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
@@ -303,6 +305,13 @@ public:
         }
         vertex_data[start].status = VertexStatus::Active;
         vertex_data[end].status = VertexStatus::Destination;
+        drawCount=0;
+        int size=graph.width*graph.height;
+        if(size<=32*32){
+            drawLoop=log(graph.width*graph.height/32) / log(2);
+        }else{
+            drawLoop=50;
+        }
         
 
         //font.loadFromFile("font/BebasNeue-Regular.ttf");
@@ -326,6 +335,11 @@ public:
     }
 
     void draw() override {
+        if(drawCount!=0){
+            drawCount=(drawCount+1)%drawLoop;
+            return;
+        }
+
         if (window.isOpen()) {
             sf::Event event;
             while (window.pollEvent(event)) // event loop
@@ -373,11 +387,9 @@ public:
                 vertex_shape.setPosition((curV%graph.width)*5, (curV/graph.width)*5);
                 window.draw(vertex_shape);
             }
-            
+            drawCount=(drawCount+1)%drawLoop;
             window.display();
             sf::sleep(sf::milliseconds(50));
-
-
         }
     }
 
