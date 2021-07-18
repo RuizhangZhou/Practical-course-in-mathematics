@@ -119,7 +119,7 @@ public:
             int widthTo = to % width;
             int widthDiff = widthTo - widthFrom;
 
-                return dist;
+            return dist;
         }
         
 
