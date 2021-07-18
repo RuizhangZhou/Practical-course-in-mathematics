@@ -383,11 +383,7 @@ public:
                 vertex_shape.setPosition((curV % graph.width) * 5, (curV / graph.width) * 5);
                 window.draw(vertex_shape);
             }
-<<<<<<< HEAD
             drawCount=(drawCount+1)%drawLoop;
-=======
-
->>>>>>> 892bfccf14414f5fb39be03211dc2f64eb4b92e3
             window.display();
             sf::sleep(sf::milliseconds(50));
         }
