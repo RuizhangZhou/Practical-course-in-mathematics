@@ -249,11 +249,13 @@ int main() {
         ifstream s(file);
         s >> graph;
         PruefeHeuristik(graph);
+        
         for (auto pair : StartZielPaare(example)) {
             auto start = pair.first;
             auto goal = pair.second;
             list<VertexT> weg(graph.numVertices());
-            if (A_star(graph, start, goal, weg)) {
+            MazeGraphVisualiser v(graph, start, goal);
+            if (A_star(graph, v , start, goal, weg)) {
                 PruefeWeg(example, weg);
             }
             //(Berechne den kuerzesten Weg von start zu goal)
@@ -277,7 +279,8 @@ int main() {
             }
         }
         list<VertexT> weg(graph.numVertices());
-        if (A_star(graph, start, goal, weg)) {
+        MazeGraphVisualiser v(graph, start, goal);
+        if (A_star(graph, v, start, goal, weg)) {
             PruefeWeg(example, weg);
         }
 

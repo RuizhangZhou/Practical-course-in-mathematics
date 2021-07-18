@@ -8,10 +8,17 @@ using namespace std;
 using LocalEdgeT = std::pair<VertexT,CostT>;
 
 class MazeGraph : public DistanceGraph {
-    protected:
+    public:
         size_t height;
         size_t width;
         vector<CellType> nodes;
+
+    protected:
+        /*
+        size_t height;
+        size_t width;
+        vector<CellType> nodes;
+        */
         vector<NeighborT> adjacencyList;
     
     public:
@@ -46,6 +53,20 @@ class MazeGraph : public DistanceGraph {
             nodes.clear();
             nodes.shrink_to_fit();
         }
+
+        /*
+        size_t getHeight(){
+            return height;
+        }
+
+        size_t getWidth(){
+            return width;
+        }
+
+        const CellType getNodesType(VertexT v){
+            return nodes[v];
+        }
+        */
 
         const NeighborT getNeighbors(VertexT v) const override {
             return adjacencyList[v];

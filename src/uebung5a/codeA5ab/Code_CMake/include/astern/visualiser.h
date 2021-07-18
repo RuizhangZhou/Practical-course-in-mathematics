@@ -264,3 +264,143 @@ public:
         }
     }
 };
+
+
+
+
+
+
+class MazeGraphVisualiser : public GraphVisualizer {
+    struct VertexData {
+        VertexStatus status;
+        double cost;
+        double estimate;
+        VertexT parent;
+    };
+
+    vector<VertexData> vertex_data;
+
+    sf::RenderWindow window;
+
+    VertexT start;
+    VertexT end;
+
+    const MazeGraph &graph;
+
+    sf::Font font;
+
+public:
+    MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
+            vertex_data(graph.numVertices()),
+            window(sf::VideoMode(graph.height, graph.width), "My window"),
+            start(start), end(end), graph(graph){
+
+        for (auto &t : vertex_data) {
+            t.status = VertexStatus::UnknownVertex;
+            t.cost = infty;
+            t.estimate = infty;
+            t.parent = undefinedVertex;
+        }
+        vertex_data[start].status = VertexStatus::Active;
+        vertex_data[end].status = VertexStatus::Destination;
+        
+
+        font.loadFromFile("font/BebasNeue-Regular.ttf");
+    }
+
+    ~MazeGraphVisualiser() override {
+        window.close();
+    }
+
+    void markVertex(VertexT vertex, VertexStatus status) override {
+        vertex_data[vertex].status = vertex == end ? VertexStatus::Destination : status;;
+    }
+
+    void markEdge(EdgeT edge, EdgeStatus status) override {}
+
+    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
+        vertex_data[vertex].status = vertex == end ? VertexStatus::Destination : status;
+        vertex_data[vertex].cost = cost;
+        vertex_data[vertex].estimate = estimate;
+        vertex_data[vertex].parent = parent;
+    }
+
+    void draw() override {
+        if (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) // event loop
+            {
+                // "close requested" event: we close the window
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                } else if (event.type == sf::Event::Resized) {
+                    sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                    window.setView(sf::View(visibleArea));
+                }
+            }
+
+            window.clear(sf::Color::White);
+
+            sf::RectangleShape vertex_shape(sf::Vector2f(1.f, 1.f));
+            size_t active=-1;
+            //vertex_shape.setOrigin(vertex_shape.getRadius(), vertex_shape.getRadius());
+            for (size_t i = 0; i < vertex_data.size(); i++) {
+                if (i == start) {
+                    vertex_shape.setFillColor(RED);
+                } else if (vertex_data[i].status == VertexStatus::Destination) {
+                    vertex_shape.setFillColor(ORANGE);
+                } else if (vertex_data[i].status == VertexStatus::Done) {
+                    vertex_shape.setFillColor(BLUE);
+                } else if (vertex_data[i].status == VertexStatus::Active) {
+                    vertex_shape.setFillColor(YELLOW);
+                    active=i;
+                } else if (vertex_data[i].status == VertexStatus::InQueue) {
+                    vertex_shape.setFillColor(GREY);
+                } else if(graph.nodes[i]==CellType::Wall){
+                    vertex_shape.setFillColor(BLACK);
+                } else if (graph.nodes[i]==CellType::Ground){
+                    vertex_shape.setFillColor(DARK_GREY);
+                }
+                /*
+                else {
+                    vertex_shape.setFillColor(GREY);
+                }
+                */
+                vertex_shape.setPosition(i%graph.width, i/graph.width);
+                window.draw(vertex_shape);
+            }
+
+            VertexT curV=undefinedVertex;
+            while(curV!=start){
+                curV=vertex_data[curV].parent;
+                vertex_shape.setFillColor(GREEN);
+                vertex_shape.setPosition(curV%graph.width, curV/graph.width);
+                window.draw(vertex_shape);
+            }
+
+            window.display();
+            sf::sleep(sf::milliseconds(200));
+
+
+        }
+    }
+
+
+    void finish() override {
+        while (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) // event loop
+            {
+                // "close requested" event: we close the window
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                } else if (event.type == sf::Event::Resized) {
+                    sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                    window.setView(sf::View(visibleArea));
+                }
+            }
+            draw();
+            sf::sleep(sf::milliseconds(10));
+        }
+    }
+};
