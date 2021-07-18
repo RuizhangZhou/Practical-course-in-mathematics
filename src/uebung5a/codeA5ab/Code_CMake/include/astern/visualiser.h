@@ -292,7 +292,7 @@ class MazeGraphVisualiser : public GraphVisualizer {
 public:
     MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
             vertex_data(graph.numVertices()),
-            window(sf::VideoMode(graph.height, graph.width), "My window"),
+            window(sf::VideoMode(graph.height*10, graph.width*10), "My window"),
             start(start), end(end), graph(graph){
 
         for (auto &t : vertex_data) {
@@ -341,9 +341,8 @@ public:
 
             window.clear(sf::Color::White);
 
-            sf::RectangleShape vertex_shape(sf::Vector2f(1.f, 1.f));
+            sf::RectangleShape vertex_shape(sf::Vector2f(10.f, 10.f));
             size_t active=-1;
-            //vertex_shape.setOrigin(vertex_shape.getRadius(), vertex_shape.getRadius());
             for (size_t i = 0; i < vertex_data.size(); i++) {
                 if (i == start) {
                     vertex_shape.setFillColor(RED);
@@ -361,26 +360,21 @@ public:
                 } else if (graph.nodes[i]==CellType::Ground){
                     vertex_shape.setFillColor(DARK_GREY);
                 }
-                /*
-                else {
-                    vertex_shape.setFillColor(GREY);
-                }
-                */
-                vertex_shape.setPosition(i%graph.width, i/graph.width);
+                vertex_shape.setPosition(i%graph.width*10, i/graph.width*10);
                 window.draw(vertex_shape);
             }
 
-            VertexT curV=undefinedVertex;
+            //draw the route from start to active vertex
+            VertexT curV=active;
             while(curV!=start){
                 curV=vertex_data[curV].parent;
                 vertex_shape.setFillColor(GREEN);
-                vertex_shape.setPosition(curV%graph.width, curV/graph.width);
+                vertex_shape.setPosition(curV%graph.width*10, curV/graph.width*10);
                 window.draw(vertex_shape);
             }
 
             window.display();
             sf::sleep(sf::milliseconds(200));
-
 
         }
     }
