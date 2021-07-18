@@ -292,7 +292,7 @@ class MazeGraphVisualiser : public GraphVisualizer {
 public:
     MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
             vertex_data(graph.numVertices()),
-            window(sf::VideoMode(graph.height*10, graph.width*10), "My window"),
+            window(sf::VideoMode(graph.width*10, graph.height*10), "My window"),
             start(start), end(end), graph(graph){
 
         for (auto &t : vertex_data) {
@@ -360,7 +360,7 @@ public:
                 } else if (graph.nodes[i]==CellType::Ground){
                     vertex_shape.setFillColor(DARK_GREY);
                 }
-                vertex_shape.setPosition(i%graph.width*10, i/graph.width*10);
+                vertex_shape.setPosition((i%graph.width)*10, (i/graph.width)*10);
                 window.draw(vertex_shape);
             }
 
@@ -369,7 +369,7 @@ public:
             while(curV!=start){
                 curV=vertex_data[curV].parent;
                 vertex_shape.setFillColor(GREEN);
-                vertex_shape.setPosition(curV%graph.width*10, curV/graph.width*10);
+                vertex_shape.setPosition((curV%graph.width)*10, (curV/graph.width)*10);
                 window.draw(vertex_shape);
             }
 
