@@ -267,10 +267,6 @@ public:
 };
 
 
-
-
-
-
 class MazeGraphVisualiser : public GraphVisualizer {
     struct VertexData {
         VertexStatus status;
@@ -293,8 +289,8 @@ class MazeGraphVisualiser : public GraphVisualizer {
 public:
     MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
             vertex_data(graph.numVertices()),
-            window(sf::VideoMode(graph.width*5, graph.height*5), "My Window"),
-            start(start), end(end), graph(graph){  
+            window(sf::VideoMode(graph.width * 5, graph.height * 5), "My Window"),
+            start(start), end(end), graph(graph) {
         for (auto &t : vertex_data) {
             t.status = VertexStatus::UnknownVertex;
             t.cost = infty;
@@ -303,7 +299,7 @@ public:
         }
         vertex_data[start].status = VertexStatus::Active;
         vertex_data[end].status = VertexStatus::Destination;
-        
+
 
         //font.loadFromFile("font/BebasNeue-Regular.ttf");
     }
@@ -340,7 +336,7 @@ public:
             }
             window.clear(sf::Color::White);
             sf::RectangleShape vertex_shape(sf::Vector2f(5.f, 5.f));
-            size_t active=start;
+            size_t active = start;
             for (size_t i = 0; i < vertex_data.size(); i++) {
                 if (i == start) {
                     vertex_shape.setFillColor(RED);
@@ -350,30 +346,30 @@ public:
                     vertex_shape.setFillColor(BLUE);
                 } else if (vertex_data[i].status == VertexStatus::Active) {
                     vertex_shape.setFillColor(YELLOW);
-                    active=i;
+                    active = i;
                 } else if (vertex_data[i].status == VertexStatus::InQueue) {
                     vertex_shape.setFillColor(GREY);
-                } else if(graph.nodes[i]==CellType::Wall){
+                } else if (graph.nodes[i] == CellType::Wall) {
                     vertex_shape.setFillColor(BLACK);
-                } else if (graph.nodes[i]==CellType::Ground){
+                } else if (graph.nodes[i] == CellType::Ground) {
                     vertex_shape.setFillColor(DARK_GREY);
                 }
-                
-                vertex_shape.setPosition((i%graph.width)*5, (i/graph.width)*5);
+
+                vertex_shape.setPosition((i % graph.width) * 5, (i / graph.width) * 5);
                 window.draw(vertex_shape);
             }
-            
-            VertexT curV=active;
-            while(curV!=start){
-                if(vertex_data[curV].parent==start){
-                  break;
+
+            VertexT curV = active;
+            while (curV != start) {
+                if (vertex_data[curV].parent == start) {
+                    break;
                 }
-                curV=vertex_data[curV].parent;
+                curV = vertex_data[curV].parent;
                 vertex_shape.setFillColor(GREEN);
-                vertex_shape.setPosition((curV%graph.width)*5, (curV/graph.width)*5);
+                vertex_shape.setPosition((curV % graph.width) * 5, (curV / graph.width) * 5);
                 window.draw(vertex_shape);
             }
-            
+
             window.display();
             sf::sleep(sf::milliseconds(50));
 
@@ -383,7 +379,7 @@ public:
 
 
     void finish() override {
-        
+
         while (window.isOpen()) {
             sf::Event event;
             while (window.pollEvent(event)) // event loop
@@ -391,18 +387,16 @@ public:
                 // "close requested" event: we close the window
                 if (event.type == sf::Event::Closed) {
                     window.close();
-                } 
-                
-                else if (event.type == sf::Event::Resized) {
+                } else if (event.type == sf::Event::Resized) {
                     sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
                     window.setView(sf::View(visibleArea));
                 }
-                
+
             }
             draw();
             sf::sleep(sf::milliseconds(10));
         }
-        
+
     }
-    
+
 };
