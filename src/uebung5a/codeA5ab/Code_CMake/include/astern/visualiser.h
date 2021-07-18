@@ -162,7 +162,7 @@ public:
             for (pair<EdgeT, EdgeData> t : edge_data) {
                 sf::Color line_color;
                 if (t.second.status == EdgeStatus::Active) {
-                    line_color = DARK_GREEN;
+                    line_color = YELLOW;
                 } else if (t.second.status == EdgeStatus::Optimal) {
                     line_color = DARK_RED;
                 } else if (t.second.status == EdgeStatus::Visited) {
