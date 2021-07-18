@@ -105,8 +105,6 @@ public:
 
             auto window_size = window.getSize();
             unsigned int size = max(min(window_size.x, window_size.y), 40u) - 40;
-            unsigned int offset_x = (window_size.x - size) / 2;
-            unsigned int offset_y = (window_size.y - size) / 2;
 
             double coord_min_x = 1000;
             double coord_max_x = -1000;
@@ -115,15 +113,23 @@ public:
             for (pair<double, double> coord : graph.coordinates) {
                 coord_min_x = min(((coord.second * M_PI) / 180.0), coord_min_x);
                 coord_max_x = max(((coord.second * M_PI) / 180.0), coord_max_x);
-                coord_min_y = min(-log(tan(M_PI/4 + ((coord.first * M_PI) / 180.0) / 2)), coord_min_y);
-                coord_max_y = max(-log(tan(M_PI/4 + ((coord.first * M_PI) / 180.0) / 2)), coord_max_y);
+                coord_min_y = min(-log(tan(M_PI / 4 + ((coord.first * M_PI) / 180.0) / 2)), coord_min_y);
+                coord_max_y = max(-log(tan(M_PI / 4 + ((coord.first * M_PI) / 180.0) / 2)), coord_max_y);
             }
             double max_extent = max(coord_max_x - coord_min_x, coord_max_y - coord_min_y);
+
+            double factor_x = ((window_size.x - 40) * max_extent) / (coord_max_x - coord_min_x);
+            double factor_y = ((window_size.y - 40) * max_extent) / (coord_max_y - coord_min_y);
+            size = floor(min(factor_x, factor_y));
+            unsigned int offset_x = (window_size.x - size) / 2;
+            unsigned int offset_y = (window_size.y - size) / 2;
+
             auto get_x = [=](double x) {
-                return (float) (((((x * M_PI) / 180.0) - coord_min_x) / (max_extent)) * size + offset_x);
+                return (float) (((((x * M_PI) / 180.0) - coord_min_x) / (max_extent)) * size + 20);
             };
             auto get_y = [=](double y) {
-                return (float) (((-log(tan(M_PI/4 + ((y * M_PI) / 180.0) / 2)) - coord_min_y) / (max_extent)) * size + offset_y);
+                return (float) (((-log(tan(M_PI / 4 + ((y * M_PI) / 180.0) / 2)) - coord_min_y) / (max_extent))
+                                * size + 20);
             };
 
             window.clear(sf::Color::White);
