@@ -159,7 +159,8 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
                 if (newg_v < g_v[curE.first]) {
                     vorgaenger[curE.first] = minVertexT;
-                    v.updateVertex(curE.first, newg_v, g.estimatedCost(curE.first, ziel), minVertexT, VertexStatus::InQueue);
+                    v.updateVertex(curE.first, newg_v, g.estimatedCost(curE.first, ziel), minVertexT,
+                                   VertexStatus::InQueue);
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
@@ -249,13 +250,13 @@ int main() {
         ifstream s(file);
         s >> graph;
         PruefeHeuristik(graph);
-        
+
         for (auto pair : StartZielPaare(example)) {
             auto start = pair.first;
             auto goal = pair.second;
             list<VertexT> weg(graph.numVertices());
             MazeGraphVisualiser v(graph, start, goal);
-            if (A_star(graph, v , start, goal, weg)) {
+            if (A_star(graph, v, start, goal, weg)) {
                 PruefeWeg(example, weg);
             }
             //(Berechne den kuerzesten Weg von start zu goal)
