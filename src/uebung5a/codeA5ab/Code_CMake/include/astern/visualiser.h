@@ -366,7 +366,11 @@ public:
                         vertex_shape.setFillColor(ORANGE);
                     }
                 } else if (vertex_data[i].status == VertexStatus::InQueue) {
-                    vertex_shape.setFillColor(GREY);
+                    if(i!=end){//always keep the Destination in Orange
+                        vertex_shape.setFillColor(GREY);
+                    }else{
+                        vertex_shape.setFillColor(ORANGE);
+                    }
                 } else if (graph.nodes[i] == CellType::Wall) {
                     vertex_shape.setFillColor(BLACK);
                 } else if (graph.nodes[i] == CellType::Ground) {
