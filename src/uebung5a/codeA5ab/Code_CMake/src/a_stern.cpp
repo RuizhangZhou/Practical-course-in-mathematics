@@ -152,7 +152,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             return true;
         }
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
-        //v.draw();
+        v.draw();
         for (auto curE : g.getNeighbors(minVertexT)) {
             v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Active);
             if (statuses[curE.first] != VertexStatus::Done) {
@@ -175,7 +175,8 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
         }
         statuses[minVertexT] = VertexStatus::Done;
         v.markVertex(minVertexT, VertexStatus::Done);
-        v.draw();
+        //v.draw();//do we have to draw here in the CoordinateVisiuliser? 
+        //Cuz here we don't have active nodes, so that I can't show the active routes to the active nodes in Labyrinthe
     }
     v.finish();
     return false; // Kein Weg gefunden.

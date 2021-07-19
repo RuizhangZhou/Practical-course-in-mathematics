@@ -359,8 +359,12 @@ public:
                 } else if (vertex_data[i].status == VertexStatus::Done) {
                     vertex_shape.setFillColor(BLUE);
                 } else if (vertex_data[i].status == VertexStatus::Active) {
-                    vertex_shape.setFillColor(YELLOW);
                     active = i;
+                    if(i!=end){//always keep the Destination in Orange
+                        vertex_shape.setFillColor(YELLOW);
+                    }else{
+                        vertex_shape.setFillColor(ORANGE);
+                    }
                 } else if (vertex_data[i].status == VertexStatus::InQueue) {
                     vertex_shape.setFillColor(GREY);
                 } else if (graph.nodes[i] == CellType::Wall) {
