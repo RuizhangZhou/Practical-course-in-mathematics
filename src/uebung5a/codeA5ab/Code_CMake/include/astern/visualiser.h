@@ -291,7 +291,7 @@ class MazeGraphVisualiser : public GraphVisualizer {
 public:
     MazeGraphVisualiser(const MazeGraph &graph, VertexT start, VertexT end) :
             vertex_data(graph.numVertices()),
-            window(sf::VideoMode(graph.width * 5, graph.height * 5), "My Window"),
+            window(sf::VideoMode(graph.width * 7, graph.height * 7), "My Window"),
             start(start), end(end), graph(graph) {
         for (auto &t : vertex_data) {
             t.status = VertexStatus::UnknownVertex;
@@ -301,14 +301,14 @@ public:
         }
         vertex_data[start].status = VertexStatus::Active;
         vertex_data[end].status = VertexStatus::Destination;
-        drawCount=0;
-        int size=graph.width*graph.height;
-        if(size<=32*32){
-            drawLoop=log(graph.width*graph.height/32) / log(2);
-        }else{
-            drawLoop=50;
+        drawCount = 0;
+        int size = graph.width * graph.height;
+        if (size <= 32 * 32) {
+            drawLoop = log(graph.width * graph.height / 32) / log(2);
+        } else {
+            drawLoop = 50;
         }
-        
+
 
         //font.loadFromFile("font/BebasNeue-Regular.ttf");
     }
@@ -331,8 +331,8 @@ public:
     }
 
     void draw() override {
-        if(drawCount!=0){
-            drawCount=(drawCount+1)%drawLoop;
+        if (drawCount != 0) {
+            drawCount = (drawCount + 1) % drawLoop;
             return;
         }
 
@@ -349,7 +349,7 @@ public:
                 }
             }
             window.clear(sf::Color::White);
-            sf::RectangleShape vertex_shape(sf::Vector2f(5.f, 5.f));
+            sf::RectangleShape vertex_shape(sf::Vector2f(7.f, 7.f));
             size_t active = start;
             for (size_t i = 0; i < vertex_data.size(); i++) {
                 if (i == start) {
@@ -360,15 +360,15 @@ public:
                     vertex_shape.setFillColor(BLUE);
                 } else if (vertex_data[i].status == VertexStatus::Active) {
                     active = i;
-                    if(i!=end){//always keep the Destination in Orange
+                    if (i != end) {//always keep the Destination in Orange
                         vertex_shape.setFillColor(YELLOW);
-                    }else{
+                    } else {
                         vertex_shape.setFillColor(ORANGE);
                     }
                 } else if (vertex_data[i].status == VertexStatus::InQueue) {
-                    if(i!=end){//always keep the Destination in Orange
+                    if (i != end) {//always keep the Destination in Orange
                         vertex_shape.setFillColor(GREY);
-                    }else{
+                    } else {
                         vertex_shape.setFillColor(ORANGE);
                     }
                 } else if (graph.nodes[i] == CellType::Wall) {
@@ -377,7 +377,7 @@ public:
                     vertex_shape.setFillColor(DARK_GREY);
                 }
 
-                vertex_shape.setPosition((i % graph.width) * 5, (i / graph.width) * 5);
+                vertex_shape.setPosition((i % graph.width) * 7, (i / graph.width) * 7);
                 window.draw(vertex_shape);
             }
 
@@ -388,10 +388,10 @@ public:
                 }
                 curV = vertex_data[curV].parent;
                 vertex_shape.setFillColor(GREEN);
-                vertex_shape.setPosition((curV % graph.width) * 5, (curV / graph.width) * 5);
+                vertex_shape.setPosition((curV % graph.width) * 7, (curV / graph.width) * 7);
                 window.draw(vertex_shape);
             }
-            drawCount=(drawCount+1)%drawLoop;
+            drawCount = (drawCount + 1) % drawLoop;
             window.display();
             sf::sleep(sf::milliseconds(50));
         }
