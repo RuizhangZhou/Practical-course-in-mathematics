@@ -125,7 +125,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
         VertexT minVertexT = bekannteKnoten.back();//now curVertexT is the smallest one
         bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
         v.markVertex(minVertexT, VertexStatus::Active);
-
+        v.draw();
         /*
         VertexT minVertexT=undefinedVertex;
         CostT minCost=infty;
@@ -152,7 +152,7 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             return true;
         }
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
-        v.draw();
+        
         for (auto curE : g.getNeighbors(minVertexT)) {
             v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Active);
             if (statuses[curE.first] != VertexStatus::Done) {
@@ -173,11 +173,13 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             v.draw();
             v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Visited);
         }
+
         statuses[minVertexT] = VertexStatus::Done;
         v.markVertex(minVertexT, VertexStatus::Done);
         //v.draw();//do we have to draw here in the CoordinateVisiuliser? 
         //Cuz here we don't have active nodes, so that I can't show the active routes to the active nodes in Labyrinthe
     }
+    v.draw();//if no weg has been found, then need to draw() the last situation here
     v.finish();
     return false; // Kein Weg gefunden.
 }
