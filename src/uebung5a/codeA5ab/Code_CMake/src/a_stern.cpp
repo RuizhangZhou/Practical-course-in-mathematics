@@ -257,13 +257,12 @@ bool comp(const VertexT &a,const VertexT &b){
     return f_v[a] > f_v[b];
 }
 
-
-bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, VertexT ziel, std::list<VertexT> &weg) {
+bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT ziel, std::list<VertexT> &weg) {
     // ...
     //vector<CostT> f_v;//f(v)=g(v)+h(v)
     vector<CostT> g_v;
     vector<VertexT> vorgaenger(g.numVertices());
-    vector<VertexT> bekannteKnoten;
+    vector<VertexT> bekannteKnoten;//prioity queue
     vector<VertexStatus> statuses(g.numVertices());
     bekannteKnoten.push_back(start);
     f_v.clear();
@@ -272,10 +271,14 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
         f_v.push_back(infty);
         vorgaenger.push_back(undefinedVertex);
         statuses.push_back(VertexStatus::UnknownVertex);
+        v.markVertex(i,VertexStatus::UnknownVertex);
     }
     g_v[start] = 0;
     f_v[start] = g.estimatedCost(start, ziel);
     statuses[start]=VertexStatus::InQueue;
+    v.markVertex(start,VertexStatus::InQueue);
+    statuses[ziel]=VertexStatus::Destination;
+    v.markVertex(ziel,VertexStatus::Destination);
 
     while (!bekannteKnoten.empty()) {
         //use the priority queue(make_heap) which mentioned in the script
@@ -285,9 +288,11 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
         //pop_heap is enough, because it first make a heap, then move the top element to the end
         pop_heap(bekannteKnoten.begin(), bekannteKnoten.end(), comp);//smallest value move to the back
         VertexT minVertexT = bekannteKnoten.back();//now curVertexT is the smallest one
+        statuses[minVertexT]=VertexStatus::Active;
+        v.markVertex(minVertexT,VertexStatus::Active);
         bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
         
-        /*
+        /*self definiert codes for looking up the minVertexT
         VertexT minVertexT=undefinedVertex;
         CostT minCost=infty;
         for(auto vertex : bekannteKnoten){
@@ -307,10 +312,16 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
                 curV = vorgaenger[curV];
                 weg.push_front(curV);
             }
+            /* only the Routengraphen should visualize the edges?
+            for(auto i=0;i<weg.size()-1;i++){
+                EdgeT curEdge(i,i+1);
+                v.markEdge(curEdge,EdgeStatus::Optimal);
+            }
+            */
             return true;
         }
+
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
-        statuses[minVertexT]=VertexStatus::Done;
         for (auto curE : g.getNeighbors(minVertexT)) {
             if (statuses[curE.first]!=VertexStatus::Done) {
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
@@ -319,12 +330,22 @@ bool A_star(const DistanceGraph &g, /*GraphVisualizer &v,*/ VertexT start, Verte
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
+
                 if(statuses[curE.first]==VertexStatus::UnknownVertex){
                     statuses[curE.first]=VertexStatus::InQueue;
+                    v.markVertex(curE.first,VertexStatus::InQueue);
                     bekannteKnoten.push_back(curE.first);
                 }                
+                if(statuses[curE.first]==VertexStatus::Destination && 
+                    find(bekannteKnoten.begin(),bekannteKnoten.end(),curE.first)==bekannteKnoten.end()){
+                    bekannteKnoten.push_back(curE.first);
+                    //in order not to cause duplicate nodes in bekannteKnoten
+                }
+                
             }
         }
+        statuses[minVertexT]=VertexStatus::Done;
+        v.markVertex(minVertexT,VertexStatus::Done);
     }
     return false; // Kein Weg gefunden.
 }
