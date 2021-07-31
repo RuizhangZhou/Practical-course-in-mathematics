@@ -38,7 +38,7 @@ include(${astern_SOURCE_DIR}/cmake/data_copy.cmake)
 # Handle Unit
 # ##############################################################################
 
-set(a_stern_unit)
+set(a_stern_unit include/astern/visualiser.h include/astern/graphs.h)
 if(APPLE)
   list(APPEND a_stern_unit lib/unit_mac.cpp.o)
 elseif(UNIX AND NOT APPLE)
@@ -53,7 +53,7 @@ endif()
 add_executable(a_stern src/a_stern.cpp ${a_stern_unit})
 
 # Setzt diese Variable auf true, wenn ihr Teil b bearbeitet
-option(teil_b OFF)
+option(teil_b "Teil b on" ON)
 
 # ##############################################################################
 

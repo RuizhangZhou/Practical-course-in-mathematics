@@ -142,6 +142,8 @@ public:
 
     // Zeichne den aktuellen Zustand des Graphen.
     virtual void draw() = 0;
+
+    virtual void finish() = 0;
 };
 
 #endif

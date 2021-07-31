@@ -8,179 +8,12 @@
 #include <vector>
 #include <algorithm>//make_heap
 #include <map>
+#include "astern/graphs.h"
+#include "astern/visualiser.h"
 
 using namespace std;
 
 // Ein Graph, der Koordinaten von Knoten speichert.
-class CoordinateGraph : public DistanceGraph {
-protected:
-    vector<NeighborT> adjacencyList;
-    vector<pair<double, double>> coordinates;
-
-public:
-    CoordinateGraph(int num_verts = 0)
-            : DistanceGraph(num_verts), adjacencyList(num_verts), coordinates(num_verts) {}
-
-    virtual ~CoordinateGraph() {}
-
-    const NeighborT getNeighbors(VertexT v) const override {
-        return adjacencyList[v];
-    }
-
-    CostT cost(VertexT from, VertexT to) const override {
-        if (from == to) {
-            return 0;
-        }
-        for (LocalEdgeT edge : adjacencyList[from]) {
-            if (edge.first == to) {
-                return edge.second;
-            }
-        }
-        return infty;
-    }
-
-    void resisze(int num_verts) {
-        vertexCount = num_verts;
-        adjacencyList.resize(num_verts);
-        coordinates.resize(num_verts);
-    }
-
-    void addEdge(VertexT vertex, LocalEdgeT edge) {
-        adjacencyList[vertex].push_back(edge);
-    }
-
-    void addCoordinates(int vertex, pair<double, double> coord) {
-        coordinates[vertex] = coord;
-    }
-
-    friend std::istream &operator>>(std::istream &, CoordinateGraph &);
-};
-
-class EucliGraph : public CoordinateGraph {
-public:
-    EucliGraph(int num_verts = 0)
-            : CoordinateGraph(num_verts) {}
-
-    virtual ~EucliGraph() {}
-
-    double euclideanDistance(VertexT from, VertexT to) const {
-        double diffLat = coordinates[to].first - coordinates[from].first;
-        double diffLon = coordinates[to].second - coordinates[from].second;
-
-        double dist = sqrt(pow(diffLat, 2) + pow(diffLon, 2));
-
-        return dist;
-    }
-};
-
-class CircEucliGraph : public EucliGraph {
-public:
-    CircEucliGraph(int num_verts = 0)
-            : EucliGraph(num_verts) {}
-
-    ~CircEucliGraph() {
-        for (size_t i = 0; i < adjacencyList.size(); i++) {
-            adjacencyList[i].clear();
-            adjacencyList[i].shrink_to_fit();
-        }
-        adjacencyList.clear();
-        adjacencyList.shrink_to_fit();
-
-        coordinates.clear();
-        coordinates.shrink_to_fit();
-    }
-
-    CostT estimatedCost(VertexT from, VertexT to) const override {
-        //if from and to are not neighbors, cost(from,to)=cost(to,from)=infty
-        double distance = min(euclideanDistance(from, to), min(cost(from, to), cost(to, from)));
-        return distance;
-    }
-};
-
-class ShortDistEucliGraph : public EucliGraph {
-public:
-    ShortDistEucliGraph(int num_verts = 0)
-            : EucliGraph(num_verts) {}
-
-    ~ShortDistEucliGraph() {
-        for (size_t i = 0; i < adjacencyList.size(); i++) {
-            adjacencyList[i].clear();
-            adjacencyList[i].shrink_to_fit();
-        }
-        adjacencyList.clear();
-        adjacencyList.shrink_to_fit();
-
-        coordinates.clear();
-        coordinates.shrink_to_fit();
-    }
-
-    CostT estimatedCost(VertexT from, VertexT to) const override {
-        return euclideanDistance(from, to);
-    }
-};
-
-class LonLatCoordGraph : public CoordinateGraph {
-public:
-    LonLatCoordGraph(int num_verts = 0)
-            : CoordinateGraph(num_verts) {}
-
-    virtual ~LonLatCoordGraph() {}
-
-    double latLongToDist(VertexT from, VertexT to) const {//coordinates here are Longitude and Latitude
-        double earthRadius = 6378.388;
-        double lon1 = coordinates[from].second * M_PI / 180;
-        double lon2 = coordinates[to].second * M_PI / 180;
-        double lat1 = coordinates[from].first * M_PI / 180;
-        double lat2 = coordinates[to].first * M_PI / 180;
-        double dist = earthRadius * acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1));
-
-        return dist;
-    }
-};
-
-class LongDistCoordGraph : public LonLatCoordGraph {
-public:
-    LongDistCoordGraph(int num_verts = 0)
-            : LonLatCoordGraph(num_verts) {}
-
-    ~LongDistCoordGraph() {
-        for (size_t i = 0; i < adjacencyList.size(); i++) {
-            adjacencyList[i].clear();
-            adjacencyList[i].shrink_to_fit();
-        }
-        adjacencyList.clear();
-        adjacencyList.shrink_to_fit();
-
-        coordinates.clear();
-        coordinates.shrink_to_fit();
-    }
-
-    CostT estimatedCost(VertexT from, VertexT to) const override {
-        return latLongToDist(from, to);
-    }
-};
-
-class TimeCoordGraph : public LonLatCoordGraph {
-public:
-    TimeCoordGraph(int num_verts = 0)
-            : LonLatCoordGraph(num_verts) {}
-
-    ~TimeCoordGraph() {
-        for (size_t i = 0; i < adjacencyList.size(); i++) {
-            adjacencyList[i].clear();
-            adjacencyList[i].shrink_to_fit();
-        }
-        adjacencyList.clear();
-        adjacencyList.shrink_to_fit();
-
-        coordinates.clear();
-        coordinates.shrink_to_fit();
-    }
-
-    CostT estimatedCost(VertexT from, VertexT to) const override {
-        return (latLongToDist(from, to) / 200.0) * 60.0;//estimate by driving a car with 200km/h
-    }
-};
 
 istream &operator>>(istream &s, CoordinateGraph &graph) {
     int num_verts;
@@ -253,7 +86,7 @@ void Dijkstra(const DistanceGraph &g, VertexT start, std::vector<CostT> &kostenZ
 
 vector<CostT> f_v;//f(v)=g(v)+h(v)//global variable than can be got from any function
 
-bool comp(const VertexT &a,const VertexT &b){
+bool comp(const VertexT &a, const VertexT &b) {
     return f_v[a] > f_v[b];
 }
 
@@ -265,12 +98,14 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
     vector<VertexT> bekannteKnoten;//prioity queue
     vector<VertexStatus> statuses(g.numVertices());
     bekannteKnoten.push_back(start);
+
     f_v.clear();
     for (size_t i = 0; i < g.numVertices(); i++) {
         g_v.push_back(infty);
         f_v.push_back(infty);
         vorgaenger.push_back(undefinedVertex);
         statuses.push_back(VertexStatus::UnknownVertex);
+<<<<<<< HEAD
         v.markVertex(i,VertexStatus::UnknownVertex);
     }
     g_v[start] = 0;
@@ -279,6 +114,16 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
     v.markVertex(start,VertexStatus::InQueue);
     statuses[ziel]=VertexStatus::Destination;
     v.markVertex(ziel,VertexStatus::Destination);
+=======
+        if (i != ziel) {
+            v.markVertex(i, VertexStatus::UnknownVertex);
+        }
+    }
+    g_v[start] = 0;
+    f_v[start] = g.estimatedCost(start, ziel);
+    statuses[start] = VertexStatus::InQueue;
+    v.markVertex(start, VertexStatus::InQueue);
+>>>>>>> c04daa68b5b4e7a7bc0a9d48ba9782f016d9f1e5
 
     while (!bekannteKnoten.empty()) {
         //use the priority queue(make_heap) which mentioned in the script
@@ -291,8 +136,14 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
         statuses[minVertexT]=VertexStatus::Active;
         v.markVertex(minVertexT,VertexStatus::Active);
         bekannteKnoten.pop_back();//remove the minVertexT from the bekannteKnoten
+<<<<<<< HEAD
         
         /*self definiert codes for looking up the minVertexT
+=======
+        v.markVertex(minVertexT, VertexStatus::Active);
+        v.draw();
+        /*
+>>>>>>> c04daa68b5b4e7a7bc0a9d48ba9782f016d9f1e5
         VertexT minVertexT=undefinedVertex;
         CostT minCost=infty;
         for(auto vertex : bekannteKnoten){
@@ -309,27 +160,41 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
             weg.clear();
             weg.push_front(ziel);
             while (curV != start) {
+                v.markEdge(make_pair(vorgaenger[curV], curV), EdgeStatus::Optimal);
                 curV = vorgaenger[curV];
                 weg.push_front(curV);
             }
+<<<<<<< HEAD
             /* only the Routengraphen should visualize the edges?
             for(auto i=0;i<weg.size()-1;i++){
                 EdgeT curEdge(i,i+1);
                 v.markEdge(curEdge,EdgeStatus::Optimal);
             }
             */
+=======
+            v.draw();
+            v.finish();
+>>>>>>> c04daa68b5b4e7a7bc0a9d48ba9782f016d9f1e5
             return true;
         }
 
         //here I just split all the Vertex to 3 Status:UnknownVertex,InQueue,Done
+<<<<<<< HEAD
+=======
+        
+>>>>>>> c04daa68b5b4e7a7bc0a9d48ba9782f016d9f1e5
         for (auto curE : g.getNeighbors(minVertexT)) {
-            if (statuses[curE.first]!=VertexStatus::Done) {
+            v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Active);
+            if (statuses[curE.first] != VertexStatus::Done) {
                 CostT newg_v = g_v[minVertexT] + g.cost(minVertexT, curE.first);
                 if (newg_v < g_v[curE.first]) {
                     vorgaenger[curE.first] = minVertexT;
+                    v.updateVertex(curE.first, newg_v, g.estimatedCost(curE.first, ziel), minVertexT,
+                                   VertexStatus::InQueue);
                     g_v[curE.first] = newg_v;
                     f_v[curE.first] = newg_v + g.estimatedCost(curE.first, ziel);
                 }
+<<<<<<< HEAD
 
                 if(statuses[curE.first]==VertexStatus::UnknownVertex){
                     statuses[curE.first]=VertexStatus::InQueue;
@@ -342,11 +207,30 @@ bool A_star(const DistanceGraph &g, GraphVisualizer &v, VertexT start, VertexT z
                     //in order not to cause duplicate nodes in bekannteKnoten
                 }
                 
+=======
+                if (statuses[curE.first] == VertexStatus::UnknownVertex) {
+                    statuses[curE.first] = VertexStatus::InQueue;
+                    v.markVertex(curE.first, VertexStatus::InQueue);
+                    bekannteKnoten.push_back(curE.first);
+                }
+>>>>>>> c04daa68b5b4e7a7bc0a9d48ba9782f016d9f1e5
             }
+            v.draw();
+            v.markEdge(make_pair(minVertexT, curE.first), EdgeStatus::Visited);
         }
+<<<<<<< HEAD
         statuses[minVertexT]=VertexStatus::Done;
         v.markVertex(minVertexT,VertexStatus::Done);
+=======
+
+        statuses[minVertexT] = VertexStatus::Done;
+        v.markVertex(minVertexT, VertexStatus::Done);
+        //v.draw();//do we have to draw here in the CoordinateVisiuliser? 
+        //Cuz here we don't have active nodes, so that I can't show the active routes to the active nodes in Labyrinthe
+>>>>>>> c04daa68b5b4e7a7bc0a9d48ba9782f016d9f1e5
     }
+    v.draw();//if no weg has been found, then need to draw() the last situation here
+    v.finish();
     return false; // Kein Weg gefunden.
 }
 
@@ -358,13 +242,18 @@ void dijkstra_test(const DistanceGraph &graph, int example) {
     }
 }
 
-void a_star_test(const DistanceGraph &g, int example){
-    for(size_t v1=0; v1<g.numVertices();v1++){
-        for(size_t v2=0;v2<g.numVertices();v2++){
-            if(v1!=v2){
+void a_star_test(const CoordinateGraph &g, int example) {
+    for (size_t v1 = 0; v1 < g.numVertices(); v1++) {
+        for (size_t v2 = 0; v2 < g.numVertices(); v2++) {
+            if (v1 != v2) {
+                cout << "Sollen die Texte angezeigt werden? (y/n)" << endl;
+                char s;
+                cin >> s;
+                bool show_texts = s == 'y';
                 list<VertexT> weg(g.numVertices());
-                if(A_star(g,v1,v2,weg)){
-                    PruefeWeg(example,weg);
+                CoordinateGraphVisualiser v(g, v1, v2, show_texts);
+                if (A_star(g, v, v1, v2, weg)) {
+                    PruefeWeg(example, weg);
                 }
             }
         }
@@ -385,28 +274,28 @@ int main() {
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 1);
-        a_star_test(graph,1);
+        a_star_test(graph, 1);
     } else if (example == 2) {
         CircEucliGraph graph;
         ifstream s("daten/Graph2.dat");
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 2);
-        a_star_test(graph,2);
+        a_star_test(graph, 2);
     } else if (example == 3) {
         LongDistCoordGraph graph;
         ifstream s("daten/Graph3.dat");
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 3);
-        a_star_test(graph,3);
+        a_star_test(graph, 3);
     } else if (example == 4) {
         TimeCoordGraph graph;
         ifstream s("daten/Graph4.dat");
         s >> graph;
         PruefeHeuristik(graph);
         dijkstra_test(graph, 4);
-        a_star_test(graph,4);
+        a_star_test(graph, 4);
     } else if (example >= 5 && example <= 9) {
         MazeGraph graph;
         int num = example - 4;
@@ -414,12 +303,14 @@ int main() {
         ifstream s(file);
         s >> graph;
         PruefeHeuristik(graph);
-        for ( auto pair : StartZielPaare(example)) {
+
+        for (auto pair : StartZielPaare(example)) {
             auto start = pair.first;
-            auto goal  = pair.second;
+            auto goal = pair.second;
             list<VertexT> weg(graph.numVertices());
-            if(A_star(graph,start,goal,weg)){
-                PruefeWeg(example,weg);
+            MazeGraphVisualiser v(graph, start, goal);
+            if (A_star(graph, v, start, goal, weg)) {
+                PruefeWeg(example, weg);
             }
             //(Berechne den kuerzesten Weg von start zu goal)
         }
@@ -431,26 +322,27 @@ int main() {
         maze = ErzeugeLabyrinth(256, 256, seed);
         MazeGraph graph(maze, 256, 256);
         //which start and goal should we choose here?
-        VertexT start=undefinedVertex;
-        VertexT goal=undefinedVertex;
-        for(size_t i=0;i<graph.numVertices();i++){
-            if(maze[i]==CellType::Start){
-                start=i;
+        VertexT start = undefinedVertex;
+        VertexT goal = undefinedVertex;
+        for (size_t i = 0; i < graph.numVertices(); i++) {
+            if (maze[i] == CellType::Start) {
+                start = i;
             }
-            if(maze[i]== CellType::Destination){
-                goal=i;
+            if (maze[i] == CellType::Destination) {
+                goal = i;
             }
         }
         list<VertexT> weg(graph.numVertices());
-        if(A_star(graph,start,goal,weg)){
-            PruefeWeg(example,weg);
+        MazeGraphVisualiser v(graph, start, goal);
+        if (A_star(graph, v, start, goal, weg)) {
+            PruefeWeg(example, weg);
         }
-            
-    }else {
+
+    } else {
         cout << "Ungültige Beispielnummer." << endl;
         return -1;
     }
-        
+
 
     // Loese die in der Aufgabenstellung beschriebenen Probleme fuer die jeweilige Datei
     // PruefeDijkstra / PruefeWeg
